@@ -50,6 +50,14 @@ Initialized a git repository.
 Success! Created alpha-real-state at ~/alpha-real-state
 ```
 
+## Cloning the repository
+
+`git clone git@github.com:Two-Byte-Ventures/alpha-real-state.git`
+
+## Set up after cloning
+
+`npm install`
+
 ## Project dependencies
 
 The following packages are part of our project. Any time a new project dependcy is added through `npm install` add it here. This is for future reference for different projects.
