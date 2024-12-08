@@ -1,5 +1,13 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Page() {
-  return <h1>Hello World!</h1>;
+  return (
+    <div>
+      <h1>Hello World!</h1>
+
+      <Link href="/contact">Contact us</Link>
+      <br />
+      <Link href="/about">About</Link>
+    </div>
+  );
 }
