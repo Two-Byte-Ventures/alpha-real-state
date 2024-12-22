@@ -3,13 +3,13 @@ import rosetta from 'rosetta';
 const i18n = rosetta({
     es: {
         shared:{
-            title: 'Tu siguiente casa',
+            title: 'tusiguientecasa.com',
             start: 'Comenzar',
         }
     },
     en: {
         shared:{
-            title: 'Tu siguiente casa',
+            title: 'tusiguientecasa.com',
             start: 'Start',
         }
     }
