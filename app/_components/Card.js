@@ -1,11 +1,11 @@
 import Image from "next/image";
-import { useTranslations } from "../hooks/use-translations";
+import { useTranslations } from "@/app/hooks/use-translations";
 
 export const Card = ({ type }) => {
   const { t } = useTranslations();
 
   return (
-    <div className="relative flex flex-col justify-end  shadow-lg border w-[250px] h-[150px] rounded-lg background-white">
+    <div className="relative flex flex-col justify-end  shadow-lg border w-[250px] h-[150px] rounded-lg background-white shadow-violet-100">
       <Image
         className="rounded-lg z-0 "
         src={`/types/${type}_bg.jpg`}

@@ -14,7 +14,9 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <body className="h-screen w-screen overflow-hidden">
         <Header />
-        <main className="h-full w-full flex">{children}</main>
+        <main className="h-full w-full flex bg-[url('/brand/bg.png')] bg-cover bg-center">
+          {children}
+        </main>
       </body>
     </html>
   );
