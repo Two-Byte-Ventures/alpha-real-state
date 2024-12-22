@@ -1,10 +1,13 @@
 import { Header } from "@/app/_components/Header";
-import Navigation from "./_components/Navigation";
-import '@/styles/globals.css'
+import Navigation from "@/app/_components/Navigation";
+import { TranslationService } from "@/app/services/translation-service";
+import '@/styles/globals.css';
+
+TranslationService.init();
 
 export const metadata = {
   // This will be title displayed at the web browser tab on every page
-  title: "Alpha Real State",
+  title: TranslationService.t('shared.title'),
 };
 
 export default function RootLayout({ children }) {
@@ -14,7 +17,6 @@ export default function RootLayout({ children }) {
         <Header />
         <Navigation />
         <main>{children}</main>
-        <footer>Copyright by Two Byte Ventures</footer>
       </body>
     </html>
   );
