@@ -15,6 +15,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ["Lexend", ...defaultTheme.fontFamily.sans],
+        serif: ["Jockey One", ...defaultTheme.fontFamily.serif],
       },
     },
   },

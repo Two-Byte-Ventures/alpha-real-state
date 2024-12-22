@@ -8,12 +8,12 @@ export default function Page() {
 
   return (
     <div className="grid grid-rows-[auto_auto_1fr_1fr] grid-cols-3 justify-items-center items-center h-full w-full">
-      <h1 className="text-5xl my-24 col-span-full text-center">
+      <h1 className="text-6xl my-24 col-span-full text-center font-serif">
         {t("landing.title")}{" "}
         <b className="text-violet-600">{t("landing.highlight")}</b>
       </h1>
 
-      <p className=" col-span-full my-6 text-2xl font-bold ">
+      <p className="col-span-full my-6 text-3xl font-bold">
         {t("types.title")}
       </p>
 
