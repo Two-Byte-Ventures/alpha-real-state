@@ -1,3 +1,4 @@
+import { Header } from "@/app/_components/Header";
 import Navigation from "./_components/Navigation";
 import '@/styles/globals.css'
 
@@ -10,6 +11,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
+        <Header />
         <Navigation />
         <main>{children}</main>
         <footer>Copyright by Two Byte Ventures</footer>
