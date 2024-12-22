@@ -12,7 +12,7 @@ export default function Page() {
         <b className="text-violet-600">{t("landing.highlight")}</b>
       </h1>
 
-      <p className="h-[100px] text-2xl font-bold">{t("types.types.title")}</p>
+      <p className="h-[100px] text-2xl font-bold">{t("types.title")}</p>
       <section className="flex w-full justify-around h-[300px]">
         <Card className="flex justify-center items-center">
           <Image
