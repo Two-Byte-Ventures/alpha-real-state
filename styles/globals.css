@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    @font-face {
+      font-family: 'Lexend';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url(../fonts/Lexend/Lexend-VariableFont_wght.ttf) format('truetype');
+    }
+  }
