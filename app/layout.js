@@ -1,5 +1,4 @@
 import { Header } from "@/app/_components/Header";
-import Navigation from "@/app/_components/Navigation";
 import { TranslationService } from "@/app/services/translation-service";
 import '@/styles/globals.css';
 
@@ -13,9 +12,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body>
+      <body className="w-full h-full overflow-hidden">
         <Header />
-        <Navigation />
         <main>{children}</main>
       </body>
     </html>

@@ -5,12 +5,32 @@ const i18n = rosetta({
         shared:{
             title: 'tusiguientecasa.com',
             start: 'Comenzar',
+        },
+        landing:{
+            title: 'Encuentra tu siguiente mejor',
+            highlight: 'inversión',
+        },
+        types:{
+            title: 'Tipos de Inversión',
+            industrial: 'Nave Industrial',
+            commercial: 'Plaza Comercial',
+            residential: 'Casa Residencial',
         }
     },
     en: {
         shared:{
             title: 'tusiguientecasa.com',
             start: 'Start',
+        },
+        landing:{
+            title: 'Find your next best',
+            highlight: 'investment',
+        },
+        types:{
+            title: 'Investment Types',
+            industrial: 'Industrial Warehouse',
+            commercial: 'Commercial Plaza',
+            residential: 'Residential House',
         }
     }
 });
