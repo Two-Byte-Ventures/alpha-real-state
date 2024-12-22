@@ -6,13 +6,12 @@ import { useTranslations } from "@/app/hooks/use-translations";
 export default function Page() {
   const { t } = useTranslations();
   return (
-    <article className="flex flex-col justify-center items-center">
-      <header className="h-[300px] flex justify-center items-center">
-        <h1 className="text-4xl">
-          {t("landing.title")}{" "}
-          <b className="text-violet-600">{t("landing.highlight")}</b>
-        </h1>
-      </header>
+    <div className="grid grid-rows-3 grid-cols-3 justify-items-center items-center">
+      <h1 className="text-4xl col-span-full">
+        {t("landing.title")}{" "}
+        <b className="text-violet-600">{t("landing.highlight")}</b>
+      </h1>
+
       <p className="h-[100px] text-2xl font-bold">{t("types.types.title")}</p>
       <section className="flex w-full justify-around h-[300px]">
         <Card className="flex justify-center items-center">
@@ -51,6 +50,6 @@ export default function Page() {
           {t("shared.start")}
         </button>
       </Link>
-    </article>
+    </div>
   );
 }
