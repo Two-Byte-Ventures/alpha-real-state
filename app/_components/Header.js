@@ -17,13 +17,13 @@ export const Header = () => {
         />
       </div>
       <h1 className="text-white font-sans text-3xl flex-grow">{title}</h1>
-      <div className="flex gap-4 py-2 px-4 mx-4 bg-gray-500 rounded-lg">
+      <div className="flex items-center gap-4 py-2 px-4 mx-4 bg-[rgba(77,77,77,0.5)] rounded-lg">
         <div className="text-white font-bold">ES | MX</div>
         <Image
-          className="border-2 border-gray-800"
+          className="border-2 border-gray-800 rounded-md"
           src="/langs/mexico.png"
-          width="30"
-          height="30"
+          width="35"
+          height="35"
           alt="mexican flag"
           title="Mexican flag"
         ></Image>
