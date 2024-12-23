@@ -13,7 +13,7 @@ export default function Page() {
         <b className="text-violet-600">{t("landing.highlight")}</b>
       </h1>
 
-      <p className="col-span-full my-6 text-3xl font-bold">
+      <p className="col-span-full my-6 text-3xl font-bold bg-white rounded-lg p-4 border">
         {t("types.title")}
       </p>
 
