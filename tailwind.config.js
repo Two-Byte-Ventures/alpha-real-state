@@ -1,4 +1,4 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -16,6 +16,9 @@ module.exports = {
       fontFamily: {
         sans: ["Lexend", ...defaultTheme.fontFamily.sans],
         serif: ["Jockey One", ...defaultTheme.fontFamily.serif],
+      },
+      screens: {
+        xs: "480px", // Custom extra small breakpoint
       },
     },
   },
