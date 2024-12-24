@@ -12,7 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body className="h-screen w-screen overflow-hidden">
+      <body className="flex flex-col h-screen w-screen overflow-scroll">
         <Header />
         <main className="h-full w-full flex bg-[url('/brand/bg.png')] bg-cover bg-center">
           {children}

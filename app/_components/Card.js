@@ -20,13 +20,14 @@ export const Card = ({ type }) => {
         style={{ backgroundImage: `url('/types/${type}_bg.jpg')` }}
       ></div>
 
-      <div className="bg-white py-2 flex justify-center z-10 rounded-b-lg">
+      <div className="bg-white items-center xs:py-0 md:py-1 lg:py-2 flex justify-center z-10 rounded-b-lg text-sm md:text-base lg:text-xl">
         <Image
           src={`/types/${type}.jpg`}
           width="25"
           height="25"
           alt={t(`types.${type}`)}
           title={t(`types.${type}`)}
+          className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"
         />
         {t(`types.${type}`)}
       </div>
