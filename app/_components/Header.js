@@ -6,7 +6,7 @@ export const Header = () => {
   const { t } = useTranslations();
   const title = t("shared.title");
   return (
-    <header className="bg-black flex px-4 py-4 items-center h-[70px]">
+    <header className="bg-black flex px-6 py-4 items-center h-[70px] justify-between">
       <Link href="/" className="flex items-center pr-2 ">
         <Image
           className=" w-[40px] pr-2"
@@ -16,10 +16,10 @@ export const Header = () => {
           alt={title}
           title={title}
         />
+        <h1 className="text-white flex-grow font-sans text-xl lg:text-2xl">
+          {title}
+        </h1>
       </Link>
-      <h1 className="text-white flex-grow font-sans text-xs xs:text-sm md:text-lg lg:text-2xl">
-        {title}
-      </h1>
       <div className=" flex items-center py-1  sm:py-2  mx-4 bg-[rgba(77,77,77,0.5)] rounded-lg">
         <div className="text-white text-xs xs:text-sm sm:text-base font-bold mx-1 sm:mx-2 ">
           ES | MX
