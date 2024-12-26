@@ -1,5 +1,7 @@
 "use client"
 import { useEffect, useRef } from "react";
+import {Popover, PopoverTrigger, PopoverContent, Button} from "@nextui-org/react";
+import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -27,7 +29,31 @@ export default function Page() {
 
   return (
     <div className="w-full h-screen flex justify-center items-center">
-      <div id='map-container' className="w-full h-full" ref={mapContainerRef}/>
+      <div id='map-container' className="w-full h-full" ref={mapContainerRef}>
+        <Popover placement="bottom">
+          <PopoverTrigger>
+            <Button className="m-2">State/Province Placeholder</Button>
+          </PopoverTrigger>
+            <PopoverContent>
+              <Card isBlurred className="border-none" shadow="none">
+                <CardHeader className="text-small font-bold">State/Province</CardHeader>
+                <CardBody className="text-tiny">Popover content</CardBody>
+              </Card>
+          </PopoverContent>
+        </Popover>
+        <Popover placement="bottom">
+          <PopoverTrigger>
+            <Button className="m-2">House Placeholder</Button>
+          </PopoverTrigger>
+            <PopoverContent>
+              <Card isBlurred className="border-none" shadow="none">
+                <CardHeader className="text-small font-bold">Title</CardHeader>
+                <CardBody className="text-tiny">Popover content</CardBody>
+                <CardFooter className="text-small">Popover actions</CardFooter>
+              </Card>
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   );
 }
