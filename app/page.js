@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@nextui-org/button";
 import { Card } from "@/app/_components/Card";
 import { useTranslations } from "@/app/hooks/use-translations";
 
@@ -24,9 +25,9 @@ export default function Page() {
       </section>
 
       <Link className="col-span-full self-start my-12" href="/map">
-        <button className="bg-black text-white w-[200px] h-[45px] rounded-xl text-xs sm:text-sm md:text-base lg:text-lg hover:bg-zinc-700 hover:shadow-2xl">
+        <Button size="lg" radius="lg" className="bg-black text-white w-[200px] text-xs sm:text-sm md:text-base lg:text-lg hover:shadow-2xl">
           {t("shared.start")}
-        </button>
+        </Button>
       </Link>
     </div>
   );

@@ -1,3 +1,4 @@
+import { NextUIProvider } from "@nextui-org/react";
 import { Header } from "@/app/_components/Header";
 import { TranslationService } from "@/app/services/translation-service";
 import "@/styles/globals.css";
@@ -12,11 +13,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body className="flex flex-col h-screen w-screen overflow-hidden">
-        <Header />
-        <main className="h-full w-full flex bg-[url('/brand/bg.png')] bg-cover bg-center">
-          {children}
-        </main>
+      <body>
+        <NextUIProvider className="flex flex-col h-screen w-screen overflow-hidden">
+          <Header />
+          <main className="h-full w-full flex bg-[url('/brand/bg.png')] bg-cover bg-center">
+            {children}
+          </main>
+        </NextUIProvider>
       </body>
     </html>
   );
