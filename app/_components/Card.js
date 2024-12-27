@@ -5,7 +5,7 @@ export const Card = ({ type }) => {
   const { t } = useTranslations();
 
   return (
-    <div className="flex flex-col shadow-lg border w-[250px] h-[150px] rounded-lg background-white shadow-violet-100">
+    <div className="flex flex-col shadow-lg border w-[300px] h-[200px] rounded-lg background-white shadow-violet-100 hover:shadow-violet-300 hover:shadow-2xl hover:border-purple-100">
       {/* The reason why we use style is because tailwind does not process dynamic
       paths for image URLs, thus the image won´t ever be displayed.
       

@@ -40,4 +40,5 @@ export const TranslationService = {
         i18n.locale('es');
     },
     t: i18n.t,
+    setLocale: i18n.locale,
 }
