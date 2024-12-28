@@ -1,3 +1,4 @@
+"use client";
 import rosetta from 'rosetta';
 
 const i18n = rosetta({
@@ -37,8 +38,12 @@ const i18n = rosetta({
 
 export const TranslationService = {
     init: function() {
-        i18n.locale('es');
+        i18n.locale(localStorage.getItem('locale') || 'es');
     },
     t: i18n.t,
-    setLocale: i18n.locale,
+    setLocale: (locale) => {
+        localStorage.setItem('locale', locale);
+        window.location.reload();
+    },
+    getLocale: () => i18n.locale(),
 }

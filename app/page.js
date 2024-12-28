@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@nextui-org/button";
 import { Card } from "@/app/_components/Card";
