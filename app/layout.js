@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
         <AppProvider>
           <NextUIProvider className="flex flex-col h-screen w-screen overflow-hidden">
             <Header />
-            <main className="h-full w-full flex bg-[url('/brand/bg.png')] bg-cover bg-center">
+            <main className="h-full w-full flex bg-[url('/brand/bg.png')] bg-cover bg-center overflow-auto">
               {children}
             </main>
           </NextUIProvider>
