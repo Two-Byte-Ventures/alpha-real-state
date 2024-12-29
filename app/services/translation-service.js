@@ -37,13 +37,15 @@ const i18n = rosetta({
 });
 
 export const TranslationService = {
-    init: function() {
-        i18n.locale(localStorage.getItem('locale') || 'es');
+  init: function () {
+    i18n.locale(
+      typeof window !== "undefined" ? localStorage.getItem("locale") : "es"
+    );
     },
     t: i18n.t,
     setLocale: (locale) => {
-        localStorage.setItem('locale', locale);
+    if (typeof window !== "undefined") localStorage.setItem("locale", locale);
         window.location.reload();
     },
     getLocale: () => i18n.locale(),
-}
+};
