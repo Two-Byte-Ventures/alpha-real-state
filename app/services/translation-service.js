@@ -1,39 +1,39 @@
 "use client";
-import rosetta from 'rosetta';
+import rosetta from "rosetta";
 
 const i18n = rosetta({
-    es: {
-        shared:{
-            title: 'tusiguientecasa.com',
-            start: 'Comenzar',
-        },
-        landing:{
-            title: 'Encuentra tu siguiente mejor',
-            highlight: 'inversión',
-        },
-        types:{
-            title: 'Tipos de Inversión',
-            industrial: 'Nave Industrial',
-            commercial: 'Plaza Comercial',
-            residential: 'Casa Residencial',
-        }
+  es: {
+    shared: {
+      title: "tusiguientecasa.com",
+      start: "Comenzar",
     },
-    en: {
-        shared:{
-            title: 'tusiguientecasa.com',
-            start: 'Start',
-        },
-        landing:{
-            title: 'Find your next best',
-            highlight: 'investment',
-        },
-        types:{
-            title: 'Investment Types',
-            industrial: 'Industrial Warehouse',
-            commercial: 'Commercial Plaza',
-            residential: 'Residential House',
-        }
-    }
+    landing: {
+      title: "Encuentra tu siguiente mejor",
+      highlight: "inversión",
+    },
+    types: {
+      title: "Tipos de Inversión",
+      industrial: "Nave Industrial",
+      commercial: "Plaza Comercial",
+      residential: "Casa Residencial",
+    },
+  },
+  en: {
+    shared: {
+      title: "tusiguientecasa.com",
+      start: "Start",
+    },
+    landing: {
+      title: "Find your next best",
+      highlight: "investment",
+    },
+    types: {
+      title: "Investment Types",
+      industrial: "Industrial Warehouse",
+      commercial: "Commercial Plaza",
+      residential: "Residential House",
+    },
+  },
 });
 
 export const TranslationService = {
@@ -41,11 +41,11 @@ export const TranslationService = {
     i18n.locale(
       typeof window !== "undefined" ? localStorage.getItem("locale") : "es"
     );
-    },
-    t: i18n.t,
-    setLocale: (locale) => {
+  },
+  t: i18n.t,
+  setLocale: (locale) => {
     if (typeof window !== "undefined") localStorage.setItem("locale", locale);
-        window.location.reload();
-    },
-    getLocale: () => i18n.locale(),
+    window.location.reload();
+  },
+  getLocale: () => i18n.locale(),
 };
