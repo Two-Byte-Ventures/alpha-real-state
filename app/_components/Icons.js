@@ -87,7 +87,7 @@ export function ChevronDoubleDown({ color = "currentColor" }) {
       viewBox="0 0 24 24"
       strokeWidth="2.5"
       stroke={color}
-      class="size-6"
+      className="size-6"
     >
       <path
         strokeLinecap="round"
