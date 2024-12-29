@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useRef } from "react";
 import {
+  Image,
   Popover,
   PopoverTrigger,
   PopoverContent,
   Button,
 } from "@nextui-org/react";
+import NextImage from "next/image";
 import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -57,7 +59,36 @@ export default function Page() {
             <Card isBlurred className="border-none" shadow="none">
               <CardHeader className="text-small font-bold">Title</CardHeader>
               <CardBody className="text-tiny">Popover content</CardBody>
-              <CardFooter className="text-small">Popover actions</CardFooter>
+              <CardFooter className="text-small">
+                <Image
+                  alt="Media"
+                  as={NextImage}
+                  height={40}
+                  width={47}
+                  src="/actions/media.png"
+                />
+                <Image
+                  alt="Brochure"
+                  as={NextImage}
+                  height={49}
+                  width={57}
+                  src="/actions/brochure.png"
+                />
+                <Image
+                  alt="Map"
+                  as={NextImage}
+                  height={40}
+                  width={35}
+                  src="/actions/map.png"
+                />
+                <Image
+                  alt="WhatsApp"
+                  as={NextImage}
+                  height={34}
+                  width={36}
+                  src="/actions/whatsapp.png"
+                />
+              </CardFooter>
             </Card>
           </PopoverContent>
         </Popover>
