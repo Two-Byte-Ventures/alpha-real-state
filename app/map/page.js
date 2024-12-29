@@ -14,6 +14,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import CallToAction from "../_components/CallToAction";
 import HousePrice from "../_components/HousePrice";
 import HouseDetails from "../_components/HouseDetails";
+import HousingOverview from "../_components/HousingOverview";
 
 export default function Page() {
   const mapRef = useRef();
@@ -47,12 +48,7 @@ export default function Page() {
             <Button className="m-2">State/Province Placeholder</Button>
           </PopoverTrigger>
           <PopoverContent>
-            <Card isBlurred className="border-none" shadow="none">
-              <CardHeader className="text-small font-bold">
-                State/Province
-              </CardHeader>
-              <CardBody className="text-tiny">Popover content</CardBody>
-            </Card>
+            <HousingOverview />
           </PopoverContent>
         </Popover>
 
