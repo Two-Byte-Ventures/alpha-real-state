@@ -24,8 +24,8 @@ export default function Page() {
 
     return () => {
       mapRef.current.remove();
-    }
-  }, [])
+    };
+  }, [isMapboxSupported]);
 
   return (
     <div className="w-full h-screen flex justify-center items-center">
