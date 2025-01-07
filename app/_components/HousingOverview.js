@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader } from "@nextui-org/react";
 import OverviewRow from "./OverviewRow";
 
-function HousingOverview() {
+function HousingOverview({ name }) {
   const dwellings = [
     {
       id: 1,
@@ -28,7 +28,7 @@ function HousingOverview() {
   return (
     <Card isBlurred className="border-none" shadow="none">
       <CardHeader className="text-small font-bold justify-center">
-        <h1 className="text-xl text-violet-700 font-serif">Querétaro</h1>
+        <h1 className="text-xl text-violet-700 font-serif">{name}</h1>
       </CardHeader>
       <CardBody className="text-tiny">
         {dwellings.map((dwelling) => (

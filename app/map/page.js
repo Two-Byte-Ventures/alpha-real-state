@@ -21,6 +21,7 @@ import municipalities from '@/geojson/municipalities.json';
 export default function Page() {
   const mapRef = useRef();
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [hoverInfo, setHoverInfo] = useState(null);
 
   const mapboxToken = useMemo(()=>{
     if (process.env.NEXT_PUBLIC_MAPBOX_ENABLE == "true"){
@@ -33,10 +34,27 @@ export default function Page() {
     setIsMapLoaded(true);
   }, []);
 
+  const onMouseEnterHandler = useCallback(event => {
+    const {
+      features,
+      point: {x, y}
+    } = event;
+  
+    const hoveredFeature = features && features[0];
+
+    if (["states", "municipalities"].includes(hoveredFeature?.layer?.id)) {
+      setHoverInfo(hoveredFeature && {feature: hoveredFeature, x, y});
+    }
+  }, []);
+
+  const onMouseLeaveHandler = useCallback(() => {
+    setHoverInfo(null);
+  }, []);
+
   return (
     <Map
       ref={mapRef}
-      className="w-full h-screen flex justify-center items-center"
+      className="w-full h-screen flex justify-center items-center relative"
       mapboxAccessToken={mapboxToken}
       initialViewState={{
         longitude: -100.668,
@@ -45,6 +63,9 @@ export default function Page() {
       }}
       mapStyle={process.env.NEXT_PUBLIC_MAPBOX_GL_STYLE_URL}
       onLoad={onLoadHandler}
+      interactiveLayerIds={["states", "municipalities"]}
+      onMouseEnter={onMouseEnterHandler}
+      onMouseLeave={onMouseLeaveHandler}
     >
       {isMapLoaded && (
           [
@@ -56,7 +77,7 @@ export default function Page() {
                   "fill-color": "#3bac35",
                   "fill-opacity": 0.5,
                 }}
-                filter={["==", "state_name", "Querétaro"]}
+                filter={["in", "state_name", "Querétaro", "Jalisco"]}
               />
               <Layer
                 id="states-line"
@@ -65,7 +86,7 @@ export default function Page() {
                   "line-color": "#277916",
                   "line-width": 1,
                 }}
-                filter={["==", "state_name", "Querétaro"]}
+                filter={["in", "state_name", "Querétaro", "Jalisco"]}
                 />
             </Source>
           ,
@@ -77,7 +98,7 @@ export default function Page() {
                   "fill-color": "#3bac35",
                   "fill-opacity": 0.5,
                 }}
-                filter={["==", "mun_name", "Querétaro"]}
+                filter={["in", "mun_name", "Querétaro", "Guadalajara"]}
               />
               <Layer
                 id="municipalities-line"
@@ -86,19 +107,28 @@ export default function Page() {
                   "line-color": "#277916",
                   "line-width": 1,
                 }}
-                filter={["==", "mun_name", "Querétaro"]}
+                filter={["in", "mun_name", "Querétaro", "Guadalajara"]}
                 />
             </Source>
           ]
       )}
-      <Popover placement="bottom">
-        <PopoverTrigger>
-          <Button className="m-2">State/Province Placeholder</Button>
-        </PopoverTrigger>
-        <PopoverContent>
-          <HousingOverview />
-        </PopoverContent>
-      </Popover>
+  
+      { hoverInfo && (
+        <Popover placement="bottom" isOpen={true}>
+          <PopoverTrigger>
+            <div style={{
+              position: 'absolute',
+              left: hoverInfo.x,
+              top: hoverInfo.y
+            }}/>
+          </PopoverTrigger>
+          <PopoverContent>
+            <HousingOverview name={
+              hoverInfo?.feature?.properties?.state_name ?? hoverInfo?.feature?.properties?.mun_name
+            }/>
+          </PopoverContent>
+        </Popover>
+      )}
 
       <Popover placement="bottom">
         <PopoverTrigger>
