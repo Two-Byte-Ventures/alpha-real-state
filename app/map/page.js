@@ -81,20 +81,28 @@ export default function Page() {
   // database to verify its correctness and avoid any potential security
   // issue
 
-  // 1. Get the state names from the GeoJSON database
+  // 1. Get the state and municipality names from the GeoJSON database
   const allStateNames = states["features"].map(
     (state) => state["properties"]["state_name"]
   );
+  const allMunNames = municipalities["features"].map(
+    (mun) => mun["properties"]["mun_name"]
+  );
 
   // 2. Read the housing data base, get the state names
-  const toBeDisplayed = db["housingList"].map((house) => house["state_name"]);
+  const dbStateNames = db["housingList"].map((house) => house["state_name"]);
+  const dbMunNames = db["housingList"].map((house) => house["mun_name"]);
 
   // 3. Check against the GeoJSON list.
   //    We could directly pass the variable toBeDisplayed to our map
   //    filter but we want to perform one last check to avoid
   //    any malicious string retrieved from the data base
-  const filteredNames = allStateNames.filter((state) =>
-    toBeDisplayed.includes(state)
+  const filteredStateNames = allStateNames.filter((state) =>
+    dbStateNames.includes(state)
+  );
+
+  const filteredMunNames = allMunNames.filter((municipality) =>
+    dbMunNames.includes(municipality)
   );
 
   return (
@@ -130,7 +138,7 @@ export default function Page() {
                 ],
               },
             }}
-            filter={["in", "state_name", ...filteredNames]}
+            filter={["in", "state_name", ...filteredStateNames]}
           />
           <Layer
             id="states-line"
@@ -140,7 +148,7 @@ export default function Page() {
               "line-width": 2,
               "line-opacity": 0.5,
             }}
-            filter={["in", "state_name", ...filteredNames]}
+            filter={["in", "state_name", ...filteredStateNames]}
           />
         </Source>,
         <Source key="municipalitiesSource" type="geojson" data={municipalities}>
@@ -157,7 +165,7 @@ export default function Page() {
                 ],
               },
             }}
-            filter={["in", "mun_name", "Querétaro", "Guadalajara", "Zapopan"]}
+            filter={["in", "mun_name", ...filteredMunNames]}
           />
           <Layer
             id="municipalities-line"
@@ -172,7 +180,7 @@ export default function Page() {
                 ],
               },
             }}
-            filter={["in", "mun_name", "Querétaro", "Guadalajara", "Zapopan"]}
+            filter={["in", "mun_name", ...filteredMunNames]}
           />
         </Source>,
       ]}
