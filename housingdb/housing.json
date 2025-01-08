@@ -1,6 +1,67 @@
 {
   "housingList": [
-    { "state_name": "Jalisco", "mun_name": "Guadalajara", "price": 1234567 },
-    { "state_name": "Querétaro", "mun_name": "Querétaro", "price": 1234567 }
+    {
+      "id": 1,
+      "state_name": "Jalisco",
+      "mun_name": "Guadalajara",
+      "type": "house",
+      "percentage": "11.9%",
+      "increased": true,
+      "price": "4,513,900"
+    },
+    {
+      "id": 2,
+      "state_name": "Jalisco",
+      "mun_name": "Guadalajara",
+      "type": "plaza",
+      "percentage": "15.9%",
+      "increased": true,
+      "price": "2,000,760"
+    },
+    {
+      "id": 3,
+      "state_name": "Jalisco",
+      "mun_name": "Zapopan",
+      "type": "industrial",
+      "percentage": "9.9%",
+      "increased": false,
+      "price": "10,913,900"
+    },
+    {
+      "id": 4,
+      "state_name": "Querétaro",
+      "mun_name": "Querétaro",
+      "type": "house",
+      "percentage": "5.9%",
+      "increased": false,
+      "price": "4,513,900"
+    },
+    {
+      "id": 5,
+      "state_name": "Querétaro",
+      "mun_name": "Querétaro",
+      "type": "plaza",
+      "percentage": "25.9%",
+      "increased": false,
+      "price": "2,000,760"
+    },
+    {
+      "id": 6,
+      "state_name": "Querétaro",
+      "mun_name": "Querétaro",
+      "type": "industrial",
+      "percentage": "19.9%",
+      "increased": true,
+      "price": "10,913,900"
+    },
+    {
+      "id": 7,
+      "state_name": "Oaxaca",
+      "mun_name": "Oaxaca",
+      "type": "house",
+      "percentage": "19.9%",
+      "increased": true,
+      "price": "10,913,900"
+    }
   ]
 }

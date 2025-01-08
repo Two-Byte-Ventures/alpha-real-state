@@ -198,10 +198,8 @@ export default function Page() {
           </PopoverTrigger>
           <PopoverContent>
             <HousingOverview
-              name={
-                hoverInfo?.feature?.properties?.state_name ??
-                hoverInfo?.feature?.properties?.mun_name
-              }
+              stateName={hoverInfo?.feature?.properties?.state_name}
+              munName={hoverInfo?.feature?.properties?.mun_name}
             />
           </PopoverContent>
         </Popover>

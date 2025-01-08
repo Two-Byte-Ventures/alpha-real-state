@@ -1,34 +1,25 @@
 import { Card, CardBody, CardHeader } from "@nextui-org/react";
 import OverviewRow from "./OverviewRow";
+import db from "@/housingdb/housing.json";
 
-function HousingOverview({ name }) {
-  const dwellings = [
-    {
-      id: 1,
-      price: "4,513,900",
-      type: "house",
-      percentage: "11.9%",
-      increased: true,
-    },
-    {
-      id: 2,
-      price: "2,000,760",
-      type: "plaza",
-      percentage: "15.9%",
-      increased: true,
-    },
-    {
-      id: 3,
-      price: "10,913,900",
-      type: "industrial",
-      percentage: "9.9%",
-      increased: false,
-    },
-  ];
+function HousingOverview({ stateName = null, munName = null }) {
+  let dwellings;
+  if (stateName !== null)
+    dwellings = db["housingList"].filter(
+      (house) => house["state_name"] === stateName
+    );
+  if (munName !== null) {
+    dwellings = db["housingList"].filter(
+      (house) => house["mun_name"] === munName
+    );
+  }
+
   return (
     <Card isBlurred className="border-none" shadow="none">
       <CardHeader className="text-small font-bold justify-center">
-        <h1 className="text-xl text-violet-700 font-serif">{name}</h1>
+        <h1 className="text-xl text-violet-700 font-serif">
+          {stateName || munName}
+        </h1>
       </CardHeader>
       <CardBody className="text-tiny">
         {dwellings.map((dwelling) => (
