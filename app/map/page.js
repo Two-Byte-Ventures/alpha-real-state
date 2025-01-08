@@ -7,6 +7,7 @@ import {
   Button,
   Divider,
 } from "@nextui-org/react";
+import bbox from '@turf/bbox';
 
 import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -51,6 +52,23 @@ export default function Page() {
     setHoverInfo(null);
   }, []);
 
+
+  const onClickHandler = (event) => {
+    const feature = event.features[0];
+    if (feature) {
+      // calculate the bounding box of the feature
+      const [minLng, minLat, maxLng, maxLat] = bbox(feature);
+
+      mapRef.current.fitBounds(
+        [
+          [minLng, minLat],
+          [maxLng, maxLat]
+        ],
+        {padding: 40, duration: 1000}
+      );
+    }
+  };
+
   return (
     <Map
       ref={mapRef}
@@ -66,6 +84,7 @@ export default function Page() {
       interactiveLayerIds={["states", "municipalities"]}
       onMouseMove={onMouseEnterHandler}
       onMouseLeave={onMouseLeaveHandler}
+      onClick={onClickHandler}
     >
       {isMapLoaded && (
           [
