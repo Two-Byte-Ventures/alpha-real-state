@@ -64,7 +64,7 @@ export default function Page() {
       mapStyle={process.env.NEXT_PUBLIC_MAPBOX_GL_STYLE_URL}
       onLoad={onLoadHandler}
       interactiveLayerIds={["states", "municipalities"]}
-      onMouseEnter={onMouseEnterHandler}
+      onMouseMove={onMouseEnterHandler}
       onMouseLeave={onMouseLeaveHandler}
     >
       {isMapLoaded && (
@@ -75,7 +75,13 @@ export default function Page() {
                 type="fill"
                 paint={{
                   "fill-color": "#3bac35",
-                  "fill-opacity": 0.5,
+                  "fill-opacity": {
+                    "stops": [
+                      [5, 0.5],
+                      [7, 0.25],
+                      [10, 0.05]
+                    ]
+                  }
                 }}
                 filter={["in", "state_name", "Querétaro", "Jalisco"]}
               />
@@ -84,7 +90,8 @@ export default function Page() {
                 type="line"
                 paint={{
                   "line-color": "#277916",
-                  "line-width": 1,
+                  "line-width": 2,
+                  "line-opacity": 0.5
                 }}
                 filter={["in", "state_name", "Querétaro", "Jalisco"]}
                 />
@@ -96,7 +103,13 @@ export default function Page() {
                 type="fill"
                 paint={{
                   "fill-color": "#3bac35",
-                  "fill-opacity": 0.5,
+                  "fill-opacity": {
+                    "stops": [
+                      [5, 0],
+                      [10, 0.5],
+                      [12, 0.05],
+                    ]
+                  }
                 }}
                 filter={["in", "mun_name", "Querétaro", "Guadalajara"]}
               />
@@ -105,7 +118,13 @@ export default function Page() {
                 type="line"
                 paint={{
                   "line-color": "#277916",
-                  "line-width": 1,
+                  "line-width": 2,
+                  "line-opacity": {
+                    "stops": [
+                      [5, 0],
+                      [10, 0.5],
+                    ]
+                  }
                 }}
                 filter={["in", "mun_name", "Querétaro", "Guadalajara"]}
                 />
