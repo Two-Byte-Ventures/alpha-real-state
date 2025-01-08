@@ -53,7 +53,7 @@ export default function Page() {
   }, []);
 
 
-  const onClickHandler = (event) => {
+  const onClickHandler = useCallback((event) => {
     const feature = event.features[0];
     if (feature) {
       // calculate the bounding box of the feature
@@ -62,12 +62,20 @@ export default function Page() {
       mapRef.current.fitBounds(
         [
           [minLng, minLat],
-          [maxLng, maxLat]
+          [maxLng, maxLat],
         ],
-        {padding: 40, duration: 1000}
+        { duration: 1000 }
       );
+
+      // pitch the map after zooming
+      setTimeout(() => {
+        mapRef.current.easeTo({ pitch: 45 });
+      }, 1000);
+    }else{
+        // reset the pitch if clicked on empty space
+        mapRef.current.easeTo({ pitch: 0 });
     }
-  };
+  }, []);
 
   return (
     <Map
@@ -77,8 +85,9 @@ export default function Page() {
       initialViewState={{
         longitude: -100.668,
         latitude: 23.42,
-        zoom: 4.8
+        zoom: 4.8,
       }}
+      minZoom={4}
       mapStyle={process.env.NEXT_PUBLIC_MAPBOX_GL_STYLE_URL}
       onLoad={onLoadHandler}
       interactiveLayerIds={["states", "municipalities"]}
