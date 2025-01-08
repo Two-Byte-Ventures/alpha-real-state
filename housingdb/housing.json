@@ -1,0 +1,6 @@
+{
+  "housingList": [
+    { "state_name": "Jalisco", "mun_name": "Guadalajara", "price": 1234567 },
+    { "state_name": "Querétaro", "mun_name": "Querétaro", "price": 1234567 }
+  ]
+}
