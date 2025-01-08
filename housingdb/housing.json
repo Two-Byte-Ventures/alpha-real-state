@@ -39,7 +39,7 @@
     {
       "id": 5,
       "state_name": "Querétaro",
-      "mun_name": "Querétaro",
+      "mun_name": "Tequisquiapan",
       "type": "plaza",
       "percentage": "25.9%",
       "increased": false,
@@ -48,7 +48,7 @@
     {
       "id": 6,
       "state_name": "Querétaro",
-      "mun_name": "Querétaro",
+      "mun_name": "Pedro Escobedo",
       "type": "industrial",
       "percentage": "19.9%",
       "increased": true,
@@ -57,7 +57,7 @@
     {
       "id": 7,
       "state_name": "Oaxaca",
-      "mun_name": "Oaxaca",
+      "mun_name": "Abejones",
       "type": "house",
       "percentage": "19.9%",
       "increased": true,
