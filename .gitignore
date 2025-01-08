@@ -130,3 +130,7 @@ dist
 .pnp.*
 
 .DS_Store
+
+launch.json
+.env.adrian
+.env.sergio
