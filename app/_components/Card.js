@@ -1,8 +1,13 @@
+"use client";
 import Image from "next/image";
 import { useTranslations } from "@/app/hooks/use-translations";
+import { useEffect, useState } from "react";
 
 export const Card = ({ type }) => {
+  const [isClient, setIsClient] = useState(false);
   const { t } = useTranslations();
+
+  useEffect(() => setIsClient(true), []);
 
   return (
     <div className="flex flex-col shadow-lg border w-[300px] h-[200px] rounded-lg background-white shadow-violet-100 hover:shadow-violet-300 hover:shadow-2xl hover:border-purple-100">
@@ -25,11 +30,11 @@ export const Card = ({ type }) => {
           src={`/types/${type}.jpg`}
           width="25"
           height="25"
-          alt={t(`types.${type}`)}
-          title={t(`types.${type}`)}
+          alt={isClient ? t(`types.${type}`) : "ssr-alt"}
+          title={isClient ? t(`types.${type}`) : "ssr-alt"}
           className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"
         />
-        {t(`types.${type}`)}
+        {isClient && t(`types.${type}`)}
       </div>
     </div>
   );
