@@ -38,9 +38,11 @@ const i18n = rosetta({
 
 export const TranslationService = {
   init: function () {
-    i18n.locale(
-      typeof window !== "undefined" ? localStorage.getItem("locale") : "es"
-    );
+    let myLocale;
+    if (typeof window !== "undefined")
+      myLocale = localStorage.getItem("locale");
+    myLocale = myLocale || "es";
+    i18n.locale(myLocale);
   },
   t: i18n.t,
   setLocale: (locale) => {
