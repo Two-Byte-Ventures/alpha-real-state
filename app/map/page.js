@@ -56,21 +56,33 @@ export default function Page() {
   const onClickHandler = useCallback((event) => {
     const feature = event.features[0];
     if (feature) {
+      const layerId = feature.layer.id;
       // calculate the bounding box of the feature
-      const [minLng, minLat, maxLng, maxLat] = bbox(feature);
+      let [minLng, minLat, maxLng, maxLat] = bbox(feature);
+      let duration = 1000;
+
+      if (layerId === "markers") {
+        // add padding to the marker bounding box
+        const padding = 0.0025;
+        minLng -= padding;
+        minLat -= padding;
+        maxLng += padding;
+        maxLat += padding;
+        duration = 2000;
+      }
 
       mapRef.current.fitBounds(
         [
           [minLng, minLat],
           [maxLng, maxLat],
         ],
-        { duration: 1000 }
+        { duration }
       );
 
       // pitch the map after zooming
       setTimeout(() => {
         mapRef.current.easeTo({ pitch: 45 });
-      }, 1000);
+      }, duration);
     } else {
       // reset the pitch if clicked on empty space
       mapRef.current.easeTo({ pitch: 0 });
@@ -129,7 +141,7 @@ export default function Page() {
       minZoom={4}
       mapStyle={process.env.NEXT_PUBLIC_MAPBOX_GL_STYLE_URL}
       onLoad={onLoadHandler}
-      interactiveLayerIds={["states", "municipalities"]}
+      interactiveLayerIds={["states", "municipalities", "markers"]}
       onMouseMove={onMouseEnterHandler}
       onMouseLeave={onMouseLeaveHandler}
       onClick={onClickHandler}
