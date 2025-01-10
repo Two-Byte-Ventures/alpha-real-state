@@ -1,10 +1,10 @@
 import { Accordion, AccordionItem, Image } from "@nextui-org/react";
 
-function HouseDetails() {
+function HouseDetails({ name }) {
   return (
-    <div className="flex flex-col items-center flex-grow ">
+    <div className="flex flex-col items-center flex-grow">
       <h1 className="font-sans text-xl my-2 text-violet-700 font-bold">
-        Grand House: Casa Harmony
+        {name}
       </h1>
       <Image
         alt="Example house"

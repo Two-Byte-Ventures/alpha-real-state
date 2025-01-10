@@ -23,7 +23,8 @@ import db from "@/housingdb/housing.json";
 export default function Page() {
   const mapRef = useRef();
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [hoverInfo, setHoverInfo] = useState(null);
+  const [locationHoverInfo, setLocationHoverInfo] = useState(null);
+  const [housingHoverInfo, setHousingHoverInfo] = useState(null);
 
   const mapboxToken = useMemo(() => {
     if (process.env.NEXT_PUBLIC_MAPBOX_ENABLE == "true") {
@@ -44,14 +45,21 @@ export default function Page() {
 
     const hoveredFeature = features && features[0];
 
-    if (["states", "municipalities"].includes(hoveredFeature?.layer?.id)) {
-      setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+    if (hoveredFeature?.layer?.id === "markers") {
+      setHousingHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+      setLocationHoverInfo(null);
+    } else if (["states", "municipalities"].includes(hoveredFeature?.layer?.id)) {
+      setHousingHoverInfo(null);
+      setLocationHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
     }
   }, []);
 
-  const onMouseLeaveHandler = useCallback(() => {
-    setHoverInfo(null);
-  }, []);
+  function clearHoverInfo() {
+    setHousingHoverInfo(null);
+    setLocationHoverInfo(null);
+  }
+
+  const onMouseLeaveHandler = useCallback(clearHoverInfo, []);
 
   const onClickHandler = useCallback((event) => {
     const feature = event.features[0];
@@ -78,6 +86,9 @@ export default function Page() {
         ],
         { duration }
       );
+
+      // clear the hover info while zooming
+      clearHoverInfo();
 
       // pitch the map after zooming
       setTimeout(() => {
@@ -108,7 +119,7 @@ export default function Page() {
     "type": "FeatureCollection",
     "features": db["housingList"].map((house) => ({
       "type": "Feature",
-      "properties": {},
+      "properties": { ...house },
       "geometry": {
         "coordinates": house["coordinates"],
         "type": "Point"
@@ -224,51 +235,58 @@ export default function Page() {
         </Source>,
       ]}
 
-      {hoverInfo && (
-        <Popover placement="bottom" isOpen={true}>
+      {locationHoverInfo && (
+        <Popover placement="right" isOpen={true}>
           <PopoverTrigger>
             <div
               style={{
                 position: "absolute",
-                left: hoverInfo.x,
-                top: hoverInfo.y,
+                left: locationHoverInfo.x,
+                top: locationHoverInfo.y,
               }}
             />
           </PopoverTrigger>
           <PopoverContent>
             <HousingOverview
-              stateName={hoverInfo?.feature?.properties?.state_name}
-              munName={hoverInfo?.feature?.properties?.mun_name}
+              stateName={locationHoverInfo?.feature?.properties?.state_name}
+              munName={locationHoverInfo?.feature?.properties?.mun_name}
             />
           </PopoverContent>
         </Popover>
       )}
 
-      <Popover placement="bottom">
-        <PopoverTrigger>
-          <Button className="m-2">House Placeholder</Button>
-        </PopoverTrigger>
+      {housingHoverInfo && (
+        <Popover placement="right" isOpen={true}>
+          <PopoverTrigger>
+            <div
+              style={{
+                position: "absolute",
+                left: housingHoverInfo.x,
+                top: housingHoverInfo.y,
+              }}
+            />
+          </PopoverTrigger>
+          <PopoverContent>
+            <Card isBlurred className="border-none" shadow="none">
+              <CardHeader className="text-small font-bold">
+                <HousePrice price={housingHoverInfo?.feature?.properties?.price} />
+              </CardHeader>
 
-        <PopoverContent>
-          <Card isBlurred className="border-none" shadow="none">
-            <CardHeader className="text-small font-bold">
-              <HousePrice price="4,000,000" />
-            </CardHeader>
+              <Divider />
 
-            <Divider />
+              <CardBody className="text-tiny">
+                <HouseDetails name={housingHoverInfo?.feature?.properties?.name}/>
+              </CardBody>
 
-            <CardBody className="text-tiny">
-              <HouseDetails />
-            </CardBody>
+              <Divider />
 
-            <Divider />
-
-            <CardFooter className="text-small">
-              <CallToAction />
-            </CardFooter>
-          </Card>
-        </PopoverContent>
-      </Popover>
+              <CardFooter className="text-small">
+                <CallToAction />
+              </CardFooter>
+            </Card>
+          </PopoverContent>
+        </Popover>
+      )}
     </Map>
   );
 }
