@@ -2,66 +2,36 @@
   "housingList": [
     {
       "id": 1,
-      "state_name": "Jalisco",
-      "mun_name": "Guadalajara",
-      "type": "house",
-      "percentage": "11.9%",
-      "increased": true,
-      "price": "4,513,900"
-    },
-    {
-      "id": 2,
-      "state_name": "Jalisco",
-      "mun_name": "Guadalajara",
-      "type": "plaza",
-      "percentage": "15.9%",
-      "increased": true,
-      "price": "2,000,760"
-    },
-    {
-      "id": 3,
-      "state_name": "Jalisco",
-      "mun_name": "Zapopan",
-      "type": "industrial",
-      "percentage": "9.9%",
-      "increased": false,
-      "price": "10,913,900"
-    },
-    {
-      "id": 4,
       "state_name": "Querétaro",
-      "mun_name": "Querétaro",
+      "mun_name": "El Marqués",
       "type": "house",
       "percentage": "5.9%",
       "increased": false,
-      "price": "4,513,900"
+      "price": "4,513,900",
+      "name": "Casa Amaray",
+      "coordinates": [-100.33671844059357, 20.672106355565433]
     },
     {
-      "id": 5,
+      "id": 2,
       "state_name": "Querétaro",
-      "mun_name": "Tequisquiapan",
+      "mun_name": "Corregidora",
       "type": "plaza",
       "percentage": "25.9%",
-      "increased": false,
-      "price": "2,000,760"
+      "increased": true,
+      "price": "2,000,760",
+      "name": "Bosque de Olivos",
+      "coordinates": [-100.4339845, 20.5356594]
     },
     {
-      "id": 6,
+      "id": 3,
       "state_name": "Querétaro",
-      "mun_name": "Pedro Escobedo",
+      "mun_name": "Querétaro",
       "type": "industrial",
       "percentage": "19.9%",
       "increased": true,
-      "price": "10,913,900"
-    },
-    {
-      "id": 7,
-      "state_name": "Oaxaca",
-      "mun_name": "Abejones",
-      "type": "house",
-      "percentage": "19.9%",
-      "increased": true,
-      "price": "10,913,900"
+      "price": "10,913,900",
+      "name": "Parque Industrial",
+      "coordinates": [-100.4518962, 20.8241001]
     }
   ]
 }

@@ -92,6 +92,17 @@ export default function Page() {
   // 2. Read the housing data base, get the state names
   const dbStateNames = db["housingList"].map((house) => house["state_name"]);
   const dbMunNames = db["housingList"].map((house) => house["mun_name"]);
+  const markers = {
+    "type": "FeatureCollection",
+    "features": db["housingList"].map((house) => ({
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": house["coordinates"],
+        "type": "Point"
+      }
+    }))
+  };
 
   // 3. Check against the GeoJSON list.
   //    We could directly pass the variable toBeDisplayed to our map
@@ -181,6 +192,22 @@ export default function Page() {
               },
             }}
             filter={["in", "mun_name", ...filteredMunNames]}
+          />
+        </Source>,
+        <Source key="markersSource" type="geojson" data={markers}>
+          <Layer
+            id="markers"
+            type="symbol"
+            layout={{
+              "icon-image": "map-marker",
+              "icon-size": {
+                stops: [
+                  [9, 0],
+                  [10, 0.25],
+                  [20, 0.35],
+                ],
+              },
+            }}
           />
         </Source>,
       ]}
