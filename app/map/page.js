@@ -25,6 +25,8 @@ export default function Page() {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [locationHoverInfo, setLocationHoverInfo] = useState(null);
   const [housingHoverInfo, setHousingHoverInfo] = useState(null);
+  const [housingMouseOver, setHousingMouseOver] = useState(false);
+  const [locationMouseOver, setLocationMouseOver] = useState(false);
 
   const mapboxToken = useMemo(() => {
     if (process.env.NEXT_PUBLIC_MAPBOX_ENABLE == "true") {
@@ -37,6 +39,10 @@ export default function Page() {
     setIsMapLoaded(true);
   }, []);
 
+  let featureMouseEnterTimer = null;
+  let housingMouseEnterTimer = null;
+  let locationMouseEnterTimer = null;
+
   const onMouseEnterHandler = useCallback((event) => {
     const {
       features,
@@ -45,21 +51,58 @@ export default function Page() {
 
     const hoveredFeature = features && features[0];
 
+    if (!hoveredFeature) return;
+
+    clearTimeout(featureMouseEnterTimer);
+    clearTimeout(housingMouseEnterTimer);
+    clearTimeout(locationMouseEnterTimer);
+
+    housingMouseEnterTimer = setTimeout(() => {
+      if(!housingMouseOver) setHousingHoverInfo(null);
+    }, 100);
+    locationMouseEnterTimer = setTimeout(() => {
+      if(!locationMouseOver) setLocationHoverInfo(null)
+    }, 100);
+
     if (hoveredFeature?.layer?.id === "markers") {
-      setHousingHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
-      setLocationHoverInfo(null);
+      featureMouseEnterTimer = setTimeout(() => {
+        setHousingHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+      }, 250);
     } else if (["states", "municipalities"].includes(hoveredFeature?.layer?.id)) {
-      setHousingHoverInfo(null);
-      setLocationHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+      featureMouseEnterTimer = setTimeout(() => {
+        setLocationHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+      }, 250);
     }
-  }, []);
+    return ()=>{
+      clearTimeout(featureMouseEnterTimer);
+      clearTimeout(housingMouseEnterTimer);
+      clearTimeout(locationMouseEnterTimer);
+    };
+  }, [housingMouseOver, locationMouseOver]);
+
+  let housingMouseLeaveTimer = null;
+  let locationMouseLeaveTimer = null;
 
   function clearHoverInfo() {
-    setHousingHoverInfo(null);
-    setLocationHoverInfo(null);
+    onMouseLeaveHandler();
   }
 
-  const onMouseLeaveHandler = useCallback(clearHoverInfo, []);
+  const onMouseLeaveHandler = useCallback(()=>{
+    clearTimeout(housingMouseLeaveTimer);
+    clearTimeout(locationMouseLeaveTimer);
+
+    housingMouseLeaveTimer = setTimeout(() => {
+      if(!housingMouseOver) setHousingHoverInfo(null);
+    }, 100);
+    locationMouseLeaveTimer = setTimeout(() => {
+      if(!locationMouseOver) setLocationHoverInfo(null);
+    }, 100);
+
+    return ()=>{
+      clearTimeout(housingMouseLeaveTimer);
+      clearTimeout(locationMouseLeaveTimer);
+    }
+  }, [housingMouseOver, locationMouseOver]);
 
   const onClickHandler = useCallback((event) => {
     const feature = event.features[0];
@@ -98,7 +141,7 @@ export default function Page() {
       // reset the pitch if clicked on empty space
       mapRef.current.easeTo({ pitch: 0 });
     }
-  }, []);
+  }, [housingMouseOver, locationMouseOver]);
 
   // We use a 3 step process to validate the data retrieved from our
   // database to verify its correctness and avoid any potential security
@@ -235,58 +278,66 @@ export default function Page() {
         </Source>,
       ]}
 
-      {locationHoverInfo && (
-        <Popover placement="right-end" isOpen={true}>
-          <PopoverTrigger>
-            <div
-              style={{
-                position: "absolute",
-                left: locationHoverInfo.x,
-                top: locationHoverInfo.y,
-              }}
-            />
-          </PopoverTrigger>
-          <PopoverContent>
-            <HousingOverview
-              stateName={locationHoverInfo?.feature?.properties?.state_name}
-              munName={locationHoverInfo?.feature?.properties?.mun_name}
-            />
-          </PopoverContent>
-        </Popover>
-      )}
+      <Popover placement="right-end" isOpen={Boolean(locationHoverInfo)}>
+        <PopoverTrigger>
+          <div
+            style={{
+              position: "absolute",
+              left: locationHoverInfo?.x,
+              top: locationHoverInfo?.y,
+            }}
+          />
+        </PopoverTrigger>
+        <PopoverContent>
+          <HousingOverview
+            stateName={locationHoverInfo?.feature?.properties?.state_name}
+            munName={locationHoverInfo?.feature?.properties?.mun_name}
+            onMouseEnter={() => setLocationMouseOver(true)}
+            onMouseLeave={() => setLocationMouseOver(false)}
+          />
+        </PopoverContent>
+      </Popover>
 
-      {housingHoverInfo && (
-        <Popover placement="right-end" isOpen={true}>
-          <PopoverTrigger>
-            <div
-              style={{
-                position: "absolute",
-                left: housingHoverInfo.x,
-                top: housingHoverInfo.y,
-              }}
-            />
-          </PopoverTrigger>
-          <PopoverContent>
-            <Card isBlurred className="border-none" shadow="none">
-              <CardHeader className="text-small font-bold">
-                <HousePrice price={housingHoverInfo?.feature?.properties?.price} />
-              </CardHeader>
+      <Popover placement="right-end" isOpen={Boolean(housingHoverInfo)}>
+        <PopoverTrigger>
+          <div
+            style={{
+              position: "absolute",
+              left: housingHoverInfo?.x,
+              top: housingHoverInfo?.y,
+            }}
+          />
+        </PopoverTrigger>
+        <PopoverContent>
+          <Card 
+            isBlurred
+            className="border-none"
+            shadow="none"
+            onMouseEnter={() => {
+              console.log('onMouseEnter', housingMouseOver);
+              setHousingMouseOver(true)}}
+            onMouseLeave={() => {
+              console.log('onMouseLeave', housingMouseOver);
+              setHousingMouseOver(false)}}
+            >
+            <CardHeader className="text-small font-bold">
+              <HousePrice price={housingHoverInfo?.feature?.properties?.price} />
+            </CardHeader>
 
-              <Divider />
+            <Divider />
 
-              <CardBody className="text-tiny">
-                <HouseDetails name={housingHoverInfo?.feature?.properties?.name}/>
-              </CardBody>
+            <CardBody className="text-tiny">
+              <HouseDetails name={housingHoverInfo?.feature?.properties?.name}/>
+            </CardBody>
 
-              <Divider />
+            <Divider />
 
-              <CardFooter className="text-small">
-                <CallToAction />
-              </CardFooter>
-            </Card>
-          </PopoverContent>
-        </Popover>
-      )}
+            <CardFooter className="text-small">
+              <CallToAction />
+            </CardFooter>
+          </Card>
+        </PopoverContent>
+      </Popover>
     </Map>
   );
 }
