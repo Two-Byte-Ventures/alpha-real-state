@@ -1,5 +1,5 @@
 import { Card, CardBody, CardHeader } from "@nextui-org/react";
-import OverviewRow from "./OverviewRow";
+import OverviewRow from "@/app/_components/OverviewRow";
 import db from "@/housingdb/housing.json";
 
 function HousingOverview({ stateName = null, munName = null }) {
@@ -17,7 +17,7 @@ function HousingOverview({ stateName = null, munName = null }) {
   return (
     <Card isBlurred className="border-none" shadow="none">
       <CardHeader className="text-small font-bold justify-center">
-        <h1 className="text-xl text-violet-700 font-serif">
+        <h1 className="text-2xl text-violet-700 font-serif">
           {stateName || munName}
         </h1>
       </CardHeader>

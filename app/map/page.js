@@ -11,10 +11,10 @@ import bbox from "@turf/bbox";
 
 import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import "mapbox-gl/dist/mapbox-gl.css";
-import CallToAction from "../_components/CallToAction";
-import HousePrice from "../_components/HousePrice";
-import HouseDetails from "../_components/HouseDetails";
-import HousingOverview from "../_components/HousingOverview";
+import CallToAction from "@/app/_components/CallToAction";
+import HousePrice from "@/app/_components/HousePrice";
+import HouseDetails from "@/app/_components/HouseDetails";
+import HousingOverview from "@/app/_components/HousingOverview";
 import Map, { Source, Layer } from "react-map-gl";
 import states from "@/geojson/states.json";
 import municipalities from "@/geojson/municipalities.json";
@@ -236,7 +236,7 @@ export default function Page() {
       ]}
 
       {locationHoverInfo && (
-        <Popover placement="right" isOpen={true}>
+        <Popover placement="right-end" isOpen={true}>
           <PopoverTrigger>
             <div
               style={{
@@ -256,7 +256,7 @@ export default function Page() {
       )}
 
       {housingHoverInfo && (
-        <Popover placement="right" isOpen={true}>
+        <Popover placement="right-end" isOpen={true}>
           <PopoverTrigger>
             <div
               style={{

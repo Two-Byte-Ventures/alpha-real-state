@@ -1,7 +1,9 @@
 "use client";
-import Image from "next/image";
 import { useTranslations } from "@/app/hooks/use-translations";
 import { useEffect, useState } from "react";
+import { House, Industrial, Plaza } from "@/app/_components/Icons";
+
+
 
 export const Card = ({ type }) => {
   const [isClient, setIsClient] = useState(false);
@@ -26,14 +28,9 @@ export const Card = ({ type }) => {
       ></div>
 
       <div className="bg-white items-center xs:py-0 md:py-1 lg:py-2 flex justify-center z-10 rounded-b-lg text-sm md:text-base lg:text-xl">
-        <Image
-          src={`/types/${type}.jpg`}
-          width="25"
-          height="25"
-          alt={isClient ? t(`types.${type}`) : "ssr-alt"}
-          title={isClient ? t(`types.${type}`) : "ssr-alt"}
-          className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"
-        />
+        {type==="commercial" && <Plaza className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"/>}
+        {type==="residential" && <House className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"/>}
+        {type==="industrial" && <Industrial className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"/>}
         {isClient && t(`types.${type}`)}
       </div>
     </div>
