@@ -19,6 +19,7 @@ import Map, { Source, Layer } from "react-map-gl";
 import states from "@/geojson/states.json";
 import municipalities from "@/geojson/municipalities.json";
 import db from "@/housingdb/housing.json";
+import Script from "next/script";
 
 export default function Page() {
   const mapRef = useRef();
@@ -66,7 +67,13 @@ export default function Page() {
 
     if (hoveredFeature?.layer?.id === "markers") {
       featureMouseEnterTimer = setTimeout(() => {
-        setHousingHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
+        setHousingHoverInfo(hoveredFeature && { feature: {
+          ...hoveredFeature,
+          properties: {
+            ...hoveredFeature.properties,
+            assets: JSON.parse(hoveredFeature?.properties?.assets),
+          },
+        }, x, y });
       }, 250);
     } else if (["states", "municipalities"].includes(hoveredFeature?.layer?.id)) {
       featureMouseEnterTimer = setTimeout(() => {
@@ -314,10 +321,8 @@ export default function Page() {
             className="border-none"
             shadow="none"
             onMouseEnter={() => {
-              console.log('onMouseEnter', housingMouseOver);
               setHousingMouseOver(true)}}
             onMouseLeave={() => {
-              console.log('onMouseLeave', housingMouseOver);
               setHousingMouseOver(false)}}
             >
             <CardHeader className="text-small font-bold">
@@ -327,7 +332,10 @@ export default function Page() {
             <Divider />
 
             <CardBody className="text-tiny">
-              <HouseDetails name={housingHoverInfo?.feature?.properties?.name}/>
+              <HouseDetails
+                name={housingHoverInfo?.feature?.properties?.name}
+                tag={housingHoverInfo?.feature?.properties?.assets?.tag}
+              />
             </CardBody>
 
             <Divider />
@@ -338,6 +346,8 @@ export default function Page() {
           </Card>
         </PopoverContent>
       </Popover>
+
+      <Script src="https://product-gallery.cloudinary.com/latest/all.js" type="text/javascript"/>
     </Map>
   );
 }

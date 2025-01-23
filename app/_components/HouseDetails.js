@@ -1,19 +1,43 @@
-import { Accordion, AccordionItem, Image } from "@nextui-org/react";
+"use client";
+import { Accordion, AccordionItem } from "@nextui-org/react";
+import { useEffect } from "react";
 
-function HouseDetails({ name }) {
+function HouseDetails({ name, tag }) {
+  useEffect(() => {
+    const photoGallery = cloudinary.galleryWidget({
+      container: '#photo-gallery',
+      cloudName: `${process.env.NEXT_PUBLIC_CLOUDINARY_APP_NAME}`,
+      mediaAssets: [
+        { tag: tag, mediaType: 'image'},
+      ],
+      //carouselStyle: 'none',
+      thumbnailProps: {
+        navigationShape: "square",
+        navigationColor: "#FFFFFF",
+        navigationIconColor: "#000000",
+        selectedBorderPosition: "all",
+        mediaSymbolShape: "square",
+        width: 40,
+        height: 40,
+      },
+      carouselLocation: "bottom",
+      themeProps: {
+        active: '#6d28d9',
+        onPrimary: "#ffffff"
+      },
+      transition: "fade",
+      placeholderImage: true,
+    });
+
+    photoGallery.render();
+  }, []);
   return (
-    <div className="flex flex-col items-center flex-grow">
-      <h1 className="font-sans text-xl my-2 text-violet-700 font-bold">
+    <div className="flex flex-col justify-between items-center flex-grow">
+      <h1 className="font-sans text-2xl mb-3 text-violet-700 font-bold">
         {name}
       </h1>
-      <Image
-        alt="Example house"
-        src="/actions/image.png"
-        className="aspect-auto rounded-none"
-        width={305}
-        height={182}
-      />
-      <div className="mt-4 mb-1 rounded-lg shadow-md border-small ">
+      <div id="photo-gallery" className="w-[300px] h-[350px] p-0 m-0"/>
+      <div className="mt-4 mb-1 rounded-lg shadow-md border-small">
         <div className="flex mx-2 mt-2 flex-grow justify-between items-center">
           <h1 className="justify-self-start font-bold text-medium">
             Esquema 1

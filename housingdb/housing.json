@@ -9,6 +9,10 @@
       "increased": false,
       "price": "4,513,900",
       "name": "Casa Amaray",
+      "assets":{
+        "tag": "casa_amaray",
+        "url": "mx/qro/casa_amaray"
+      },
       "coordinates": [-100.33671844059357, 20.672106355565433]
     },
     {
@@ -20,6 +24,10 @@
       "increased": true,
       "price": "2,000,760",
       "name": "Bosque de Olivos",
+      "assets":{
+        "tag": "bosque_olivos",
+        "url": "mx/qro/bosque_olivos"
+      },
       "coordinates": [-100.4339845, 20.5356594]
     },
     {
@@ -31,6 +39,10 @@
       "increased": true,
       "price": "10,913,900",
       "name": "Parque Industrial",
+      "assets":{
+        "tag": "parque_industrial",
+        "url": "mx/qro/parque_industrial"
+      },
       "coordinates": [-100.4518962, 20.8241001]
     }
   ]

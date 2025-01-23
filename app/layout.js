@@ -1,6 +1,5 @@
 import { NextUIProvider } from "@nextui-org/react";
 import { Header } from "@/app/_components/Header";
-import { TranslationService } from "@/app/services/translation-service";
 import "@/styles/globals.css";
 import AppProvider from "@/app/providers/app-provider";
 
