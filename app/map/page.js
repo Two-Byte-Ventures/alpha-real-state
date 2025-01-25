@@ -44,48 +44,61 @@ export default function Page() {
   let housingMouseEnterTimer = null;
   let locationMouseEnterTimer = null;
 
-  const onMouseEnterHandler = useCallback((event) => {
-    const {
-      features,
-      point: { x, y },
-    } = event;
+  const onMouseEnterHandler = useCallback(
+    (event) => {
+      const {
+        features,
+        point: { x, y },
+      } = event;
 
-    const hoveredFeature = features && features[0];
+      const hoveredFeature = features && features[0];
 
-    if (!hoveredFeature) return;
+      if (!hoveredFeature) return;
 
-    clearTimeout(featureMouseEnterTimer);
-    clearTimeout(housingMouseEnterTimer);
-    clearTimeout(locationMouseEnterTimer);
-
-    housingMouseEnterTimer = setTimeout(() => {
-      if(!housingMouseOver) setHousingHoverInfo(null);
-    }, 100);
-    locationMouseEnterTimer = setTimeout(() => {
-      if(!locationMouseOver) setLocationHoverInfo(null)
-    }, 100);
-
-    if (hoveredFeature?.layer?.id === "markers") {
-      featureMouseEnterTimer = setTimeout(() => {
-        setHousingHoverInfo(hoveredFeature && { feature: {
-          ...hoveredFeature,
-          properties: {
-            ...hoveredFeature.properties,
-            assets: JSON.parse(hoveredFeature?.properties?.assets),
-          },
-        }, x, y });
-      }, 250);
-    } else if (["states", "municipalities"].includes(hoveredFeature?.layer?.id)) {
-      featureMouseEnterTimer = setTimeout(() => {
-        setLocationHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y });
-      }, 250);
-    }
-    return ()=>{
       clearTimeout(featureMouseEnterTimer);
       clearTimeout(housingMouseEnterTimer);
       clearTimeout(locationMouseEnterTimer);
-    };
-  }, [housingMouseOver, locationMouseOver]);
+
+      housingMouseEnterTimer = setTimeout(() => {
+        if (!housingMouseOver) setHousingHoverInfo(null);
+      }, 100);
+      locationMouseEnterTimer = setTimeout(() => {
+        if (!locationMouseOver) setLocationHoverInfo(null);
+      }, 100);
+
+      if (hoveredFeature?.layer?.id === "markers") {
+        featureMouseEnterTimer = setTimeout(() => {
+          setHousingHoverInfo(
+            hoveredFeature && {
+              feature: {
+                ...hoveredFeature,
+                properties: {
+                  ...hoveredFeature.properties,
+                  assets: JSON.parse(hoveredFeature?.properties?.assets),
+                },
+              },
+              x,
+              y,
+            }
+          );
+        }, 250);
+      } else if (
+        ["states", "municipalities"].includes(hoveredFeature?.layer?.id)
+      ) {
+        featureMouseEnterTimer = setTimeout(() => {
+          setLocationHoverInfo(
+            hoveredFeature && { feature: hoveredFeature, x, y }
+          );
+        }, 250);
+      }
+      return () => {
+        clearTimeout(featureMouseEnterTimer);
+        clearTimeout(housingMouseEnterTimer);
+        clearTimeout(locationMouseEnterTimer);
+      };
+    },
+    [housingMouseOver, locationMouseOver]
+  );
 
   let housingMouseLeaveTimer = null;
   let locationMouseLeaveTimer = null;
@@ -94,61 +107,64 @@ export default function Page() {
     onMouseLeaveHandler();
   }
 
-  const onMouseLeaveHandler = useCallback(()=>{
+  const onMouseLeaveHandler = useCallback(() => {
     clearTimeout(housingMouseLeaveTimer);
     clearTimeout(locationMouseLeaveTimer);
 
     housingMouseLeaveTimer = setTimeout(() => {
-      if(!housingMouseOver) setHousingHoverInfo(null);
+      if (!housingMouseOver) setHousingHoverInfo(null);
     }, 100);
     locationMouseLeaveTimer = setTimeout(() => {
-      if(!locationMouseOver) setLocationHoverInfo(null);
+      if (!locationMouseOver) setLocationHoverInfo(null);
     }, 100);
 
-    return ()=>{
+    return () => {
       clearTimeout(housingMouseLeaveTimer);
       clearTimeout(locationMouseLeaveTimer);
-    }
+    };
   }, [housingMouseOver, locationMouseOver]);
 
-  const onClickHandler = useCallback((event) => {
-    const feature = event.features[0];
-    if (feature) {
-      const layerId = feature.layer.id;
-      // calculate the bounding box of the feature
-      let [minLng, minLat, maxLng, maxLat] = bbox(feature);
-      let duration = 1000;
+  const onClickHandler = useCallback(
+    (event) => {
+      const feature = event.features[0];
+      if (feature) {
+        const layerId = feature.layer.id;
+        // calculate the bounding box of the feature
+        let [minLng, minLat, maxLng, maxLat] = bbox(feature);
+        let duration = 1000;
 
-      if (layerId === "markers") {
-        // add padding to the marker bounding box
-        const padding = 0.0025;
-        minLng -= padding;
-        minLat -= padding;
-        maxLng += padding;
-        maxLat += padding;
-        duration = 2000;
+        if (layerId === "markers") {
+          // add padding to the marker bounding box
+          const padding = 0.0025;
+          minLng -= padding;
+          minLat -= padding;
+          maxLng += padding;
+          maxLat += padding;
+          duration = 2000;
+        }
+
+        mapRef.current.fitBounds(
+          [
+            [minLng, minLat],
+            [maxLng, maxLat],
+          ],
+          { duration }
+        );
+
+        // clear the hover info while zooming
+        clearHoverInfo();
+
+        // pitch the map after zooming
+        setTimeout(() => {
+          mapRef.current.easeTo({ pitch: 45 });
+        }, duration);
+      } else {
+        // reset the pitch if clicked on empty space
+        mapRef.current.easeTo({ pitch: 0 });
       }
-
-      mapRef.current.fitBounds(
-        [
-          [minLng, minLat],
-          [maxLng, maxLat],
-        ],
-        { duration }
-      );
-
-      // clear the hover info while zooming
-      clearHoverInfo();
-
-      // pitch the map after zooming
-      setTimeout(() => {
-        mapRef.current.easeTo({ pitch: 45 });
-      }, duration);
-    } else {
-      // reset the pitch if clicked on empty space
-      mapRef.current.easeTo({ pitch: 0 });
-    }
-  }, [housingMouseOver, locationMouseOver]);
+    },
+    [housingMouseOver, locationMouseOver]
+  );
 
   // We use a 3 step process to validate the data retrieved from our
   // database to verify its correctness and avoid any potential security
@@ -166,15 +182,15 @@ export default function Page() {
   const dbStateNames = db["housingList"].map((house) => house["state_name"]);
   const dbMunNames = db["housingList"].map((house) => house["mun_name"]);
   const markers = {
-    "type": "FeatureCollection",
-    "features": db["housingList"].map((house) => ({
-      "type": "Feature",
-      "properties": { ...house },
-      "geometry": {
-        "coordinates": house["coordinates"],
-        "type": "Point"
-      }
-    }))
+    type: "FeatureCollection",
+    features: db["housingList"].map((house) => ({
+      type: "Feature",
+      properties: { ...house },
+      geometry: {
+        coordinates: house["coordinates"],
+        type: "Point",
+      },
+    })),
   };
 
   // 3. Check against the GeoJSON list.
@@ -316,17 +332,21 @@ export default function Page() {
           />
         </PopoverTrigger>
         <PopoverContent>
-          <Card 
+          <Card
             isBlurred
             className="border-none"
             shadow="none"
             onMouseEnter={() => {
-              setHousingMouseOver(true)}}
+              setHousingMouseOver(true);
+            }}
             onMouseLeave={() => {
-              setHousingMouseOver(false)}}
-            >
+              setHousingMouseOver(false);
+            }}
+          >
             <CardHeader className="text-small font-bold">
-              <HousePrice price={housingHoverInfo?.feature?.properties?.price} />
+              <HousePrice
+                price={housingHoverInfo?.feature?.properties?.price}
+              />
             </CardHeader>
 
             <Divider />
@@ -347,7 +367,10 @@ export default function Page() {
         </PopoverContent>
       </Popover>
 
-      <Script src="https://product-gallery.cloudinary.com/latest/all.js" type="text/javascript"/>
+      <Script
+        src="https://product-gallery.cloudinary.com/latest/all.js"
+        type="text/javascript"
+      />
     </Map>
   );
 }
