@@ -75,6 +75,7 @@ export default function Page() {
                 properties: {
                   ...hoveredFeature.properties,
                   assets: JSON.parse(hoveredFeature?.properties?.assets),
+                  coordinates: JSON.parse(hoveredFeature?.properties?.coordinates),
                 },
               },
               x,
@@ -361,7 +362,10 @@ export default function Page() {
             <Divider />
 
             <CardFooter className="text-small">
-              <CallToAction />
+              <CallToAction coordinates={{
+                lng: housingHoverInfo?.feature?.properties?.coordinates?.[0],
+                lat: housingHoverInfo?.feature?.properties?.coordinates?.[1],
+              }} />
             </CardFooter>
           </Card>
         </PopoverContent>

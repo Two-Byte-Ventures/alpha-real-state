@@ -1,7 +1,6 @@
 import { Card, CardBody, CardFooter, CardHeader } from "@nextui-org/react";
 import OverviewRow from "@/app/_components/OverviewRow";
 import db from "@/housingdb/housing.json";
-import CallToAction from "./CallToAction";
 
 function HousingOverview({ stateName = null, munName = null }) {
   let dwellings;
@@ -14,10 +13,6 @@ function HousingOverview({ stateName = null, munName = null }) {
       (house) => house["mun_name"] === munName
     );
   }
-  const coord = {
-    lng: dwellings[0]["coordinates"][0],
-    lat: dwellings[0]["coordinates"][1],
-  };
   return (
     <Card isBlurred className="border-none" shadow="none">
       <CardHeader className="text-small font-bold justify-center">
@@ -35,9 +30,6 @@ function HousingOverview({ stateName = null, munName = null }) {
           />
         ))}
       </CardBody>
-      <CardFooter className="text-small">
-        <CallToAction coordinates={coord} />
-      </CardFooter>
     </Card>
   );
 }
