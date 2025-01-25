@@ -1,4 +1,15 @@
-import { FaCaretDown, FaCaretUp, FaCircleQuestion, FaHouse, FaIndustry, FaLocationDot, FaMap, FaRegImage, FaStore, FaWhatsapp } from "react-icons/fa6";
+import {
+  FaCaretDown,
+  FaCaretUp,
+  FaCircleQuestion,
+  FaHouse,
+  FaIndustry,
+  FaLocationDot,
+  FaMap,
+  FaRegImage,
+  FaStore,
+  FaWhatsapp,
+} from "react-icons/fa6";
 
 export function House({ size = 25, ...props }) {
   return <FaHouse size={size} {...props} />;
@@ -28,14 +39,43 @@ export function Picture({ size = 25, ...props }) {
   return <FaRegImage size={size} {...props} />;
 }
 
-export function Brochure({ size = 25, ...props }) {
+export function Brochure({ size = 25, name = null, ...props }) {
+  if (name) {
+    return (
+      <a href={`/brochures/${name}`} target="_blank" rel="noopener noreferrer">
+        <FaMap size={size} {...props} />
+      </a>
+    );
+  }
   return <FaMap size={size} {...props} />;
 }
 
-export function Location({ size = 25, ...props }) {
+export function Location({ size = 25, coordinates = null, ...props }) {
+  if (coordinates) {
+    return (
+      <a
+        href={`https://www.google.com/maps/search/?api=1&query=${coordinates.lat},${coordinates.lng}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <FaLocationDot size={size} {...props} />
+      </a>
+    );
+  }
   return <FaLocationDot size={size} {...props} />;
 }
 
-export function Whatsapp({ size = 25, ...props }) {
+export function Whatsapp({ size = 25, number = null, ...props }) {
+  if (number) {
+    return (
+      <a
+        href={`https://wa.me/${number}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <FaWhatsapp size={size} {...props} />
+      </a>
+    );
+  }
   return <FaWhatsapp size={size} {...props} />;
 }
