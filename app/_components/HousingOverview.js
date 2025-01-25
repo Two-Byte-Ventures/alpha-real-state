@@ -28,7 +28,6 @@ function HousingOverview({ stateName = null, munName = null }) {
             price={dwelling.price}
             type={dwelling.type}
             percentage={dwelling.percentage}
-            increased={dwelling.increased}
           />
         ))}
       </CardBody>

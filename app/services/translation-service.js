@@ -17,6 +17,9 @@ const i18n = rosetta({
       commercial: "Plaza Comercial",
       residential: "Casa Residencial",
     },
+    housing: {
+      from: "desde",
+    },
   },
   en: {
     shared: {
@@ -32,6 +35,9 @@ const i18n = rosetta({
       industrial: "Industrial Warehouse",
       commercial: "Commercial Plaza",
       residential: "Residential House",
+    },
+    housing: {
+      from: "from",
     },
   },
 });
