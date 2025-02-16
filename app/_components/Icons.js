@@ -39,10 +39,10 @@ export function Picture({ size = 25, ...props }) {
   return <FaRegImage size={size} {...props} />;
 }
 
-export function Brochure({ size = 25, name = null, ...props }) {
-  if (name) {
+export function Brochure({ size = 25, url = null, ...props }) {
+  if (url) {
     return (
-      <a href={`/brochures/${name}`} target="_blank" rel="noopener noreferrer">
+      <a href={url} target="_blank" rel="noopener noreferrer">
         <FaMap size={size} {...props} />
       </a>
     );

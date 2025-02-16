@@ -362,10 +362,13 @@ export default function Page() {
             <Divider />
 
             <CardFooter className="text-small">
-              <CallToAction coordinates={{
-                lng: housingHoverInfo?.feature?.properties?.coordinates?.[0],
-                lat: housingHoverInfo?.feature?.properties?.coordinates?.[1],
-              }} />
+              <CallToAction
+                coordinates={{
+                  lng: housingHoverInfo?.feature?.properties?.coordinates?.[0],
+                  lat: housingHoverInfo?.feature?.properties?.coordinates?.[1],
+                }}
+                brochure={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_APP_NAME}/image/upload/housing_app/${housingHoverInfo?.feature?.properties?.assets?.url}/brochure.pdf`}
+              />
             </CardFooter>
           </Card>
         </PopoverContent>

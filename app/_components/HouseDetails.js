@@ -37,7 +37,7 @@ function HouseDetails({ name, tag }) {
         {name}
       </h1>
       <div id="photo-gallery" className="w-[300px] h-[350px] p-0 m-0"/>
-      <div className="mt-4 mb-1 rounded-lg shadow-md border-small">
+      {/**<div className="mt-4 mb-1 rounded-lg shadow-md border-small">
         <div className="flex mx-2 mt-2 flex-grow justify-between items-center">
           <h1 className="justify-self-start font-bold text-medium">
             Esquema 1
@@ -97,7 +97,7 @@ function HouseDetails({ name, tag }) {
             </div>
           </AccordionItem>
         </Accordion>
-      </div>
+      </div>*/}
     </div>
   );
 }
