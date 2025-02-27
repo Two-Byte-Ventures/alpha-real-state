@@ -363,6 +363,7 @@ export default function Page() {
 
             <CardFooter className="text-small">
               <CallToAction
+                name={housingHoverInfo?.feature?.properties?.name}
                 coordinates={{
                   lng: housingHoverInfo?.feature?.properties?.coordinates?.[0],
                   lat: housingHoverInfo?.feature?.properties?.coordinates?.[1],

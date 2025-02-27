@@ -65,11 +65,11 @@ export function Location({ size = 25, coordinates = null, ...props }) {
   return <FaLocationDot size={size} {...props} />;
 }
 
-export function Whatsapp({ size = 25, number = null, ...props }) {
+export function Whatsapp({ size = 25, number = null, message = '', ...props }) {
   if (number) {
     return (
       <a
-        href={`https://wa.me/${number}`}
+        href={`https://wa.me/${number}?text=${encodeURIComponent(message)}`}
         target="_blank"
         rel="noopener noreferrer"
       >
