@@ -16,7 +16,7 @@ function HousePrice({ price }) {
         <h1 className="text-4xl font-serif justify-self-start">{formattedPrice}</h1>
         <p>{currency}</p>
       </div>
-      <Info/>
+      {/**<Info/>/**/}
     </div>
   );
 }

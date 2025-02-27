@@ -28,6 +28,19 @@ export default function Page() {
   const [housingHoverInfo, setHousingHoverInfo] = useState(null);
   const [housingMouseOver, setHousingMouseOver] = useState(false);
   const [locationMouseOver, setLocationMouseOver] = useState(false);
+  // Coordinates for the popovers
+  const isMobile = useMemo(() => {
+    if (process?.browser) return window.innerWidth < 768;
+    return false;
+  }, []);
+  const locationCoordinates = useMemo(() => {
+    if (!isMobile) return {x: locationHoverInfo?.x, y: locationHoverInfo?.y, placement: "right-end"};
+    return {x: window.innerWidth / 2, y: window.innerHeight / 2, placement: "top"};
+  }, [isMobile, locationHoverInfo]);
+  const housingCoordinates = useMemo(() => {
+    if (!isMobile) return {x: housingHoverInfo?.x, y: housingHoverInfo?.y, placement: "right-end"};
+    return {x: window.innerWidth / 2, y: window.innerHeight / 2, placement: "top"};
+  }, [isMobile, housingHoverInfo]);
 
   const mapboxToken = useMemo(() => {
     if (process.env.NEXT_PUBLIC_MAPBOX_ENABLE == "true") {
@@ -302,13 +315,13 @@ export default function Page() {
         </Source>,
       ]}
 
-      <Popover placement="right-end" isOpen={Boolean(locationHoverInfo)}>
+      <Popover placement={locationCoordinates.placement} isOpen={Boolean(locationHoverInfo)}>
         <PopoverTrigger>
           <div
             style={{
               position: "absolute",
-              left: locationHoverInfo?.x,
-              top: locationHoverInfo?.y,
+              left: locationCoordinates.x,
+              top: locationCoordinates.y,
             }}
           />
         </PopoverTrigger>
@@ -322,13 +335,13 @@ export default function Page() {
         </PopoverContent>
       </Popover>
 
-      <Popover placement="right-end" isOpen={Boolean(housingHoverInfo)}>
+      <Popover placement={housingCoordinates.placement} isOpen={Boolean(housingHoverInfo)}>
         <PopoverTrigger>
           <div
             style={{
               position: "absolute",
-              left: housingHoverInfo?.x,
-              top: housingHoverInfo?.y,
+              left: housingCoordinates.x,
+              top: housingCoordinates.y,
             }}
           />
         </PopoverTrigger>
