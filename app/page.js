@@ -19,12 +19,12 @@ export default function Page() {
 
   return (
     <div className="grid grid-rows-[auto_auto_1fr_1fr] grid-cols-4 justify-items-center items-center h-full w-full">
-      <h1 className="text-4xl md:text-5xl lg:text-6xl my-8 md:my-14 lg:my-24 col-span-full text-center font-serif">
+      <h1 className="text-5xl md:text-6xl lg:text-7xl my-8 md:my-14 lg:my-24 col-span-full text-center font-serif">
         {isClient && t("landing.title")}{" "}
         <b className="text-violet-600">{isClient && t("landing.highlight")}</b>
       </h1>
 
-      <p className="col-span-full my-6 text-base md:text-xl lg:text-3xl font-bold bg-white rounded-lg p-1 sm:p-1 md:p-2 lg:p-3 border">
+      <p className="col-span-full my-6 text-xl md:text-2xl lg:text-3xl font-bold bg-white rounded-lg p-1 sm:p-1 md:p-2 lg:p-3 border">
         {isClient && t("types.title")}
       </p>
 
@@ -34,7 +34,7 @@ export default function Page() {
         ))}
       </section>
 
-      <div className="col-span-full self-start my-12">
+      <div className="col-span-full self-start pt-16 pb-16">
         <Button
           size="lg"
           radius="lg"

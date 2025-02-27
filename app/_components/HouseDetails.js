@@ -29,7 +29,10 @@ function HouseDetails({ name, tag }) {
       placeholderImage: true,
     });
 
-    photoGallery.render();
+    setTimeout(() => {
+      photoGallery.render();
+    }, 500);
+
   }, []);
   return (
     <div className="flex flex-col justify-between items-center flex-grow">
