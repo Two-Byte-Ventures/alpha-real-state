@@ -24,23 +24,17 @@ import Script from "next/script";
 export default function Page() {
   const mapRef = useRef();
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [locationHoverInfo, setLocationHoverInfo] = useState(null);
-  const [housingHoverInfo, setHousingHoverInfo] = useState(null);
-  const [housingMouseOver, setHousingMouseOver] = useState(false);
-  const [locationMouseOver, setLocationMouseOver] = useState(false);
+  const [clickedFeatureInfo, setClickedFeatureInfo] = useState(null); // Added
+
   // Coordinates for the popovers
   const isMobile = useMemo(() => {
     if (process?.browser) return window.innerWidth < 768;
     return false;
   }, []);
-  const locationCoordinates = useMemo(() => {
-    if (!isMobile) return {x: locationHoverInfo?.x, y: locationHoverInfo?.y, placement: "right-end"};
-    return {x: window.innerWidth / 2, y: window.innerHeight / 2, placement: "top"};
-  }, [isMobile, locationHoverInfo]);
-  const housingCoordinates = useMemo(() => {
-    if (!isMobile) return {x: housingHoverInfo?.x, y: housingHoverInfo?.y, placement: "right-end"};
-    return {x: window.innerWidth / 2, y: window.innerHeight / 2, placement: "top"};
-  }, [isMobile, housingHoverInfo]);
+
+  const popoverPlacement = useMemo(() => { // Added for consistent placement logic
+    return isMobile ? "top" : "right-end";
+  }, [isMobile]);
 
   const mapboxToken = useMemo(() => {
     if (process.env.NEXT_PUBLIC_MAPBOX_ENABLE == "true") {
@@ -53,93 +47,9 @@ export default function Page() {
     setIsMapLoaded(true);
   }, []);
 
-  let featureMouseEnterTimer = null;
-  let housingMouseEnterTimer = null;
-  let locationMouseEnterTimer = null;
-
-  const onMouseEnterHandler = useCallback(
+  const onDblClickHandler = useCallback(
     (event) => {
-      const {
-        features,
-        point: { x, y },
-      } = event;
-
-      const hoveredFeature = features && features[0];
-
-      if (!hoveredFeature) return;
-
-      clearTimeout(featureMouseEnterTimer);
-      clearTimeout(housingMouseEnterTimer);
-      clearTimeout(locationMouseEnterTimer);
-
-      housingMouseEnterTimer = setTimeout(() => {
-        if (!housingMouseOver) setHousingHoverInfo(null);
-      }, 100);
-      locationMouseEnterTimer = setTimeout(() => {
-        if (!locationMouseOver) setLocationHoverInfo(null);
-      }, 100);
-
-      if (hoveredFeature?.layer?.id === "markers") {
-        featureMouseEnterTimer = setTimeout(() => {
-          setHousingHoverInfo(
-            hoveredFeature && {
-              feature: {
-                ...hoveredFeature,
-                properties: {
-                  ...hoveredFeature.properties,
-                  assets: JSON.parse(hoveredFeature?.properties?.assets),
-                  coordinates: JSON.parse(hoveredFeature?.properties?.coordinates),
-                },
-              },
-              x,
-              y,
-            }
-          );
-        }, 250);
-      } else if (
-        ["states", "municipalities"].includes(hoveredFeature?.layer?.id)
-      ) {
-        featureMouseEnterTimer = setTimeout(() => {
-          setLocationHoverInfo(
-            hoveredFeature && { feature: hoveredFeature, x, y }
-          );
-        }, 250);
-      }
-      return () => {
-        clearTimeout(featureMouseEnterTimer);
-        clearTimeout(housingMouseEnterTimer);
-        clearTimeout(locationMouseEnterTimer);
-      };
-    },
-    [housingMouseOver, locationMouseOver]
-  );
-
-  let housingMouseLeaveTimer = null;
-  let locationMouseLeaveTimer = null;
-
-  function clearHoverInfo() {
-    onMouseLeaveHandler();
-  }
-
-  const onMouseLeaveHandler = useCallback(() => {
-    clearTimeout(housingMouseLeaveTimer);
-    clearTimeout(locationMouseLeaveTimer);
-
-    housingMouseLeaveTimer = setTimeout(() => {
-      if (!housingMouseOver) setHousingHoverInfo(null);
-    }, 100);
-    locationMouseLeaveTimer = setTimeout(() => {
-      if (!locationMouseOver) setLocationHoverInfo(null);
-    }, 100);
-
-    return () => {
-      clearTimeout(housingMouseLeaveTimer);
-      clearTimeout(locationMouseLeaveTimer);
-    };
-  }, [housingMouseOver, locationMouseOver]);
-
-  const onClickHandler = useCallback(
-    (event) => {
+      setClickedFeatureInfo(null); // Close popover on double click
       const feature = event.features[0];
       if (feature) {
         const layerId = feature.layer.id;
@@ -165,9 +75,6 @@ export default function Page() {
           { duration }
         );
 
-        // clear the hover info while zooming
-        clearHoverInfo();
-
         // pitch the map after zooming
         setTimeout(() => {
           mapRef.current.easeTo({ pitch: 45 });
@@ -177,8 +84,64 @@ export default function Page() {
         mapRef.current.easeTo({ pitch: 0 });
       }
     },
-    [housingMouseOver, locationMouseOver]
+    [] // Removed housingMouseOver, locationMouseOver from dependencies
   );
+
+  // Added onClickHandler for popovers
+  const onClickHandler = useCallback((event) => {
+    const { features, point: { x, y } } = event;
+    const topFeature = features && features[0];
+
+    // Prevents popover from opening when map is moving (e.g., after a drag)
+    if (mapRef.current?.isMoving() || mapRef.current?.isZooming() || mapRef.current?.isRotating()) {
+        return;
+    }
+
+    if (topFeature) {
+      const layerId = topFeature.layer.id;
+      let currentFeatureProperties = { ...topFeature.properties }; // Create a copy
+
+      if (layerId === 'markers') {
+        try {
+          // Ensure properties are parsed, provide defaults if parsing fails or properties are missing
+          const assets = topFeature.properties.assets ? JSON.parse(topFeature.properties.assets) : {};
+          const coordinates = topFeature.properties.coordinates ? JSON.parse(topFeature.properties.coordinates) : [];
+          currentFeatureProperties = {
+            ...topFeature.properties,
+            assets,
+            coordinates,
+          };
+        } catch (e) {
+          console.error("Failed to parse marker properties:", e);
+          // currentFeatureProperties remains a copy of original properties if parsing fails
+        }
+      }
+      const newClickedFeatureData = { ...topFeature, properties: currentFeatureProperties };
+
+      let isSameFeatureClicked = false;
+      if (clickedFeatureInfo && clickedFeatureInfo.layerId === layerId) {
+        const prevProps = clickedFeatureInfo.feature.properties;
+        const currentProps = newClickedFeatureData.properties;
+        // Compare based on unique identifiers if available
+        if (layerId === 'markers' && prevProps.name === currentProps.name) { // Assuming 'name' is a unique ID for markers
+          isSameFeatureClicked = true;
+        } else if (layerId === 'states' && prevProps.state_name === currentProps.state_name) {
+          isSameFeatureClicked = true;
+        } else if (layerId === 'municipalities' && prevProps.mun_name === currentProps.mun_name) {
+          isSameFeatureClicked = true;
+        }
+      }
+
+      if (isSameFeatureClicked) {
+        setClickedFeatureInfo(null); // Toggle off if same feature is clicked
+      } else {
+        setClickedFeatureInfo({ feature: newClickedFeatureData, x, y, layerId }); // Set new feature or switch to it
+      }
+    } else {
+      // Clicked on map background
+      setClickedFeatureInfo(null);
+    }
+  }, [clickedFeatureInfo]); // Dependency: clickedFeatureInfo
 
   // We use a 3 step process to validate the data retrieved from our
   // database to verify its correctness and avoid any potential security
@@ -233,9 +196,9 @@ export default function Page() {
       mapStyle={process.env.NEXT_PUBLIC_MAPBOX_GL_STYLE_URL}
       onLoad={onLoadHandler}
       interactiveLayerIds={["states", "municipalities", "markers"]}
-      onMouseMove={onMouseEnterHandler}
-      onMouseLeave={onMouseLeaveHandler}
-      onClick={onClickHandler}
+      onClick={onClickHandler} // Added onClick handler
+      onDblClick={onDblClickHandler}
+      doubleClickZoom={false}
     >
       {isMapLoaded && [
         <Source key="statesSource" type="geojson" data={states}>
@@ -315,33 +278,37 @@ export default function Page() {
         </Source>,
       ]}
 
-      <Popover placement={locationCoordinates.placement} isOpen={Boolean(locationHoverInfo)}>
+      <Popover 
+        placement={popoverPlacement} 
+        isOpen={Boolean(clickedFeatureInfo && ['states', 'municipalities'].includes(clickedFeatureInfo.layerId))}
+      >
         <PopoverTrigger>
           <div
             style={{
               position: "absolute",
-              left: locationCoordinates.x,
-              top: locationCoordinates.y,
+              left: clickedFeatureInfo?.x || 0,
+              top: clickedFeatureInfo?.y || 0,
             }}
           />
         </PopoverTrigger>
         <PopoverContent>
           <HousingOverview
-            stateName={locationHoverInfo?.feature?.properties?.state_name}
-            munName={locationHoverInfo?.feature?.properties?.mun_name}
-            onMouseEnter={() => setLocationMouseOver(true)}
-            onMouseLeave={() => setLocationMouseOver(false)}
+            stateName={clickedFeatureInfo?.feature?.properties?.state_name}
+            munName={clickedFeatureInfo?.feature?.properties?.mun_name}
           />
         </PopoverContent>
       </Popover>
 
-      <Popover placement={housingCoordinates.placement} isOpen={Boolean(housingHoverInfo)}>
+      <Popover 
+        placement={popoverPlacement} 
+        isOpen={Boolean(clickedFeatureInfo && clickedFeatureInfo.layerId === 'markers')}
+      >
         <PopoverTrigger>
           <div
             style={{
               position: "absolute",
-              left: housingCoordinates.x,
-              top: housingCoordinates.y,
+              left: clickedFeatureInfo?.x || 0,
+              top: clickedFeatureInfo?.y || 0,
             }}
           />
         </PopoverTrigger>
@@ -350,16 +317,10 @@ export default function Page() {
             isBlurred
             className="border-none"
             shadow="none"
-            onMouseEnter={() => {
-              setHousingMouseOver(true);
-            }}
-            onMouseLeave={() => {
-              setHousingMouseOver(false);
-            }}
           >
             <CardHeader className="text-small font-bold">
               <HousePrice
-                price={housingHoverInfo?.feature?.properties?.price}
+                price={clickedFeatureInfo?.feature?.properties?.price}
               />
             </CardHeader>
 
@@ -367,8 +328,8 @@ export default function Page() {
 
             <CardBody className="text-tiny">
               <HouseDetails
-                name={housingHoverInfo?.feature?.properties?.name}
-                tag={housingHoverInfo?.feature?.properties?.assets?.tag}
+                name={clickedFeatureInfo?.feature?.properties?.name}
+                tag={clickedFeatureInfo?.feature?.properties?.assets?.tag}
               />
             </CardBody>
 
@@ -376,12 +337,12 @@ export default function Page() {
 
             <CardFooter className="text-small">
               <CallToAction
-                name={housingHoverInfo?.feature?.properties?.name}
+                name={clickedFeatureInfo?.feature?.properties?.name}
                 coordinates={{
-                  lng: housingHoverInfo?.feature?.properties?.coordinates?.[0],
-                  lat: housingHoverInfo?.feature?.properties?.coordinates?.[1],
+                  lng: clickedFeatureInfo?.feature?.properties?.coordinates?.[0],
+                  lat: clickedFeatureInfo?.feature?.properties?.coordinates?.[1],
                 }}
-                brochure={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_APP_NAME}/image/upload/housing_app/${housingHoverInfo?.feature?.properties?.assets?.url}/brochure.pdf`}
+                brochure={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_APP_NAME}/image/upload/housing_app/${clickedFeatureInfo?.feature?.properties?.assets?.url}/brochure.pdf`}
               />
             </CardFooter>
           </Card>
