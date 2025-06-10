@@ -62,7 +62,7 @@ export default function Page() {
                 ],
               },
             }}
-            filter={["in", "state_name", ...filteredStateNames]}
+            filter={["in", "state_name", ...(filteredStateNames??[])]}
           />
           <Layer
             id="states-line"
@@ -72,7 +72,7 @@ export default function Page() {
               "line-width": 2,
               "line-opacity": 0.5,
             }}
-            filter={["in", "state_name", ...filteredStateNames]}
+            filter={["in", "state_name", ...(filteredStateNames??[])]}
           />
         </Source>,
         <Source key="municipalitiesSource" type="geojson" data={municipalitiesGeoJSON}>
