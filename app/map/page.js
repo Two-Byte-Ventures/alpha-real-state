@@ -7,6 +7,7 @@ import MarkerPopover from "./MarkerPopover"; // Added
 import useMap from "./useMap";
 import useSources from "./useSources";
 import useMarkers from "./useMarkers";
+import PriceFilter from "./PriceFilter"; // Added
 
 export default function Page() {
   const {
@@ -28,6 +29,11 @@ export default function Page() {
   } = useSources();
 
   const { markers } = useMarkers();
+
+  const handlePriceChange = (newPriceRange) => {
+    console.log("Selected price range:", newPriceRange);
+    // Add logic to filter markers based on price range
+  };
 
   return (
     <Map
@@ -134,6 +140,8 @@ export default function Page() {
         clickedFeatureInfo={clickedFeatureInfo}
         popoverPlacement={popoverPlacement}
       />
+
+      <PriceFilter onPriceChange={handlePriceChange} />
 
       <Script
         src="https://product-gallery.cloudinary.com/latest/all.js"
