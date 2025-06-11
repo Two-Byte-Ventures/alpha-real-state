@@ -1,17 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect
 import { Slider } from "@nextui-org/react";
-import { FaDollarSign } from "react-icons/fa"; // Changed from FaMoneyBillWave
+import { FaDollarSign } from "react-icons/fa";
+import useSourcesStore from "../stores/useSourcesStore"; // Added
 
-export default function PriceFilter({ onPriceChange, minPrice = 500000, maxPrice  = 50000000 }) {
-  const MIN_PRICE = 100000; // 100K
-  const MAX_PRICE = 10000000; // 10M
+export default function PriceFilter({ minPrice = 500000, maxPrice = 50000000 }) { // Removed onPriceChange
+  const MIN_PRICE = 100000;
+  const MAX_PRICE = 10000000;
 
-  // Default price range, e.g., 500K to 2.5M. Ensure it's within new min/max.
-  const [priceRange, setPriceRange] = useState([
-    Math.max(MIN_PRICE, minPrice),
-    Math.min(MAX_PRICE, maxPrice),
-  ]);
+  // Get setPriceRange from the store
+  const { priceRange: storePriceRange, setPriceRange: setStorePriceRange } = useSourcesStore();
+
+  // Initialize local slider state from store or props
+  const [currentSliderValue, setCurrentSliderValue] = useState(storePriceRange);
+
+  // Update slider if storePriceRange changes (e.g. on initial load)
+  useEffect(() => {
+    setCurrentSliderValue(storePriceRange);
+  }, [storePriceRange]);
 
   // Debounce function
   function debounce(func, delay) {
@@ -24,10 +30,8 @@ export default function PriceFilter({ onPriceChange, minPrice = 500000, maxPrice
   }
 
   const handleSliderChange = debounce((value) => {
-    setPriceRange(value);
-    if (onPriceChange) {
-      onPriceChange(value);
-    }
+    setCurrentSliderValue(value); // Update local state immediately for responsiveness
+    setStorePriceRange(value); // Update store, which will trigger data fetching
   }, 50);
 
   // Helper to format numbers to K/M string
@@ -57,7 +61,7 @@ export default function PriceFilter({ onPriceChange, minPrice = 500000, maxPrice
         step={100000} // 100K steps
         minValue={MIN_PRICE}
         maxValue={MAX_PRICE}
-        value={priceRange}
+        value={currentSliderValue} // Use local state for slider value
         onChange={handleSliderChange}
         classNames={{
           base: "flex-grow px-1", // Slider takes up available space

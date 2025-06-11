@@ -1,14 +1,14 @@
 "use client";
 import Map, { Source, Layer } from "react-map-gl";
 import Script from "next/script";
-import { useState } from "react";
+import { useEffect } from "react";
 
-import StateMunicipalityPopover from "./StateMunicipalityPopover"; // Added
-import MarkerPopover from "./MarkerPopover"; // Added
+import StateMunicipalityPopover from "./StateMunicipalityPopover";
+import MarkerPopover from "./MarkerPopover";
 import useMap from "./useMap";
-import useSources from "./useSources";
+import useSourcesStore from "../stores/useSourcesStore";
 import useMarkers from "./useMarkers";
-import PriceFilter from "./PriceFilter"; // Added
+import PriceFilter from "./PriceFilter";
 
 export default function Page() {
   const {
@@ -22,23 +22,19 @@ export default function Page() {
     onClickHandler,
   } = useMap();
 
-  // Initialize priceRange state here
-  const [priceRange, setPriceRange] = useState([500000, 50000000]); // Default price range
-
   const {
     statesGeoJSON,
     municipalitiesGeoJSON,
     filteredStateNames,
     filteredMunNames,
-  } = useSources(priceRange); // Pass priceRange to useSources
+    initializeSources,
+  } = useSourcesStore();
 
   const { markers } = useMarkers();
 
-  const handlePriceChange = (newPriceRange) => {
-    console.log("Selected price range:", newPriceRange);
-    setPriceRange(newPriceRange); // Update priceRange state
-    // Add logic to filter markers based on price range
-  };
+  useEffect(() => {
+    initializeSources();
+  }, [initializeSources]);
 
   return (
     <Map
@@ -54,7 +50,7 @@ export default function Page() {
       mapStyle={process.env.NEXT_PUBLIC_MAPBOX_GL_STYLE_URL}
       onLoad={onLoadHandler}
       interactiveLayerIds={["states", "municipalities", "markers"]}
-      onClick={onClickHandler} // Added onClick handler
+      onClick={onClickHandler}
       onDblClick={onDblClickHandler}
       doubleClickZoom={false}
     >
@@ -73,7 +69,7 @@ export default function Page() {
                 ],
               },
             }}
-            filter={["in", "state_name", ...(filteredStateNames??[])]}
+            filter={["in", "state_name", ...(filteredStateNames ?? [])]}
           />
           <Layer
             id="states-line"
@@ -83,7 +79,7 @@ export default function Page() {
               "line-width": 2,
               "line-opacity": 0.5,
             }}
-            filter={["in", "state_name", ...(filteredStateNames??[])]}
+            filter={["in", "state_name", ...(filteredStateNames ?? [])]}
           />
         </Source>,
         <Source key="municipalitiesSource" type="geojson" data={municipalitiesGeoJSON}>
@@ -100,7 +96,7 @@ export default function Page() {
                 ],
               },
             }}
-            filter={["in", "mun_name", ...filteredMunNames]}
+            filter={["in", "mun_name", ...(filteredMunNames ?? [])]}
           />
           <Layer
             id="municipalities-line"
@@ -115,7 +111,7 @@ export default function Page() {
                 ],
               },
             }}
-            filter={["in", "mun_name", ...filteredMunNames]}
+            filter={["in", "mun_name", ...(filteredMunNames ?? [])]}
           />
         </Source>,
         <Source key="markersSource" type="geojson" data={markers}>
@@ -146,7 +142,7 @@ export default function Page() {
         popoverPlacement={popoverPlacement}
       />
 
-      <PriceFilter onPriceChange={handlePriceChange} />
+      <PriceFilter />
 
       <Script
         src="https://product-gallery.cloudinary.com/latest/all.js"
