@@ -13,12 +13,22 @@ export default function PriceFilter({ onPriceChange, minPrice = 500000, maxPrice
     Math.min(MAX_PRICE, maxPrice),
   ]);
 
-  const handleSliderChange = (value) => {
+  // Debounce function
+  function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+  }
+
+  const handleSliderChange = debounce((value) => {
     setPriceRange(value);
     if (onPriceChange) {
       onPriceChange(value);
     }
-  };
+  }, 50);
 
   // Helper to format numbers to K/M string
   const formatLabelValue = (value) => {

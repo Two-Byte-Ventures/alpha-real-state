@@ -1,6 +1,7 @@
 "use client";
 import Map, { Source, Layer } from "react-map-gl";
 import Script from "next/script";
+import { useState } from "react";
 
 import StateMunicipalityPopover from "./StateMunicipalityPopover"; // Added
 import MarkerPopover from "./MarkerPopover"; // Added
@@ -21,17 +22,21 @@ export default function Page() {
     onClickHandler,
   } = useMap();
 
+  // Initialize priceRange state here
+  const [priceRange, setPriceRange] = useState([500000, 50000000]); // Default price range
+
   const {
     statesGeoJSON,
     municipalitiesGeoJSON,
     filteredStateNames,
     filteredMunNames,
-  } = useSources();
+  } = useSources(priceRange); // Pass priceRange to useSources
 
   const { markers } = useMarkers();
 
   const handlePriceChange = (newPriceRange) => {
     console.log("Selected price range:", newPriceRange);
+    setPriceRange(newPriceRange); // Update priceRange state
     // Add logic to filter markers based on price range
   };
 

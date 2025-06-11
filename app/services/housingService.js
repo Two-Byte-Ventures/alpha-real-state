@@ -1,19 +1,31 @@
 import supabase from '@/lib/supabaseClient'; // Assuming @/ maps to your project root or src/
 
-export async function getHousingLocationNames() {
+export async function getHousingLocationNames(minPrice, maxPrice) { // Added minPrice and maxPrice parameters
   let dbStateNames = [];
   let dbMunNames = [];
 
   try {
-    // Fetch distinct state_ids from the housing table
-    const { data: housingStateEntries, error: housingStateError } = await supabase
-      .from('housing')
-      .select();
+    // Fetch distinct state_ids and municipality_ids from housing entries within the price range
+    let query = supabase.from('housing').select('state_id, municipality_id');
 
-    if (housingStateError) {
-      console.error('Error fetching housing state entries:', housingStateError.message);
-    } else if (housingStateEntries && housingStateEntries.length > 0) {
-      const stateIds = [...new Set(housingStateEntries.map(entry => entry.state_id))];
+    if (minPrice !== undefined && minPrice !== null) {
+      query = query.gte('price', minPrice);
+    }
+    if (maxPrice !== undefined && maxPrice !== null) {
+      query = query.lte('price', maxPrice);
+    }
+
+    const { data: housingEntries, error: housingError } = await query;
+
+    if (housingError) {
+      console.error('Error fetching housing entries by price:', housingError.message);
+      // Return empty arrays or handle as appropriate
+      return { dbStateNames, dbMunNames };
+    }
+
+    if (housingEntries && housingEntries.length > 0) {
+      // Extract unique state_ids, filtering out nulls
+      const stateIds = [...new Set(housingEntries.map(entry => entry.state_id).filter(id => id != null))];
       if (stateIds.length > 0) {
         const { data: states, error: statesError } = await supabase
           .from('states')
@@ -26,17 +38,9 @@ export async function getHousingLocationNames() {
           dbStateNames = states.map(s => s.name);
         }
       }
-    }
 
-    // Fetch distinct municipality_ids from the housing table
-    const { data: housingMunEntries, error: housingMunError } = await supabase
-      .from('housing')
-      .select('municipality_id');
-
-    if (housingMunError) {
-      console.error('Error fetching housing municipality entries:', housingMunError.message);
-    } else if (housingMunEntries && housingMunEntries.length > 0) {
-      const munIds = [...new Set(housingMunEntries.map(entry => entry.municipality_id))];
+      // Extract unique municipality_ids, filtering out nulls
+      const munIds = [...new Set(housingEntries.map(entry => entry.municipality_id).filter(id => id != null))];
       if (munIds.length > 0) {
         const { data: municipalities, error: munError } = await supabase
           .from('municipalities')
@@ -53,7 +57,5 @@ export async function getHousingLocationNames() {
   } catch (error) {
     console.error('General error in getHousingLocationNames:', error.message);
   }
-  console.log('Fetched state names:', dbStateNames);
-  console.log('Fetched municipality names:', dbMunNames);
   return { dbStateNames, dbMunNames };
 }

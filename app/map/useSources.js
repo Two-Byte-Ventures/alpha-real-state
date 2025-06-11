@@ -5,7 +5,7 @@ import states from "@/geojson/states.json";
 import municipalities from "@/geojson/municipalities.json";
 import { getHousingLocationNames } from "../services/housingService"; // Adjusted import path
 
-export default function useSources() {
+export default function useSources(priceRange) {
   const [dbStateNames, setDbStateNames] = useState([]);
   const [dbMunNames, setDbMunNames] = useState([]);
 
@@ -19,12 +19,12 @@ export default function useSources() {
   useEffect(() => {
     async function fetchData() {
       const { dbStateNames: fetchedDbStateNames, dbMunNames: fetchedDbMunNames } =
-        await getHousingLocationNames();
+        await getHousingLocationNames(priceRange?.[0], priceRange?.[1]);
       setDbStateNames(fetchedDbStateNames);
       setDbMunNames(fetchedDbMunNames);
     }
     fetchData();
-  }, []); // Empty dependency array to run once on mount
+  }, [priceRange]); // Add priceRange to dependency array
 
   const filteredStateNames = allStateNames.filter((state) =>
     dbStateNames.includes(state)
