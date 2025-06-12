@@ -1,9 +1,13 @@
-import db from "@/housingdb/housing.json";
+import { useMemo } from 'react';
+import useSourcesStore from '../stores/useSourcesStore';
 
 export default function useMarkers() {
-  const markers = {
+  // Get housingData from the store
+  const housingData = useSourcesStore((state) => state.housingData);
+
+  const markers = useMemo(() => ({
     type: "FeatureCollection",
-    features: db["housingList"].map((house) => ({
+    features: housingData.map((house) => ({
       type: "Feature",
       properties: { ...house },
       geometry: {
@@ -11,7 +15,7 @@ export default function useMarkers() {
         type: "Point",
       },
     })),
-  };
+  }), [housingData]);
 
   return {
     markers,

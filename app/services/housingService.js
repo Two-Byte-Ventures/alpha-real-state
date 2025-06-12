@@ -10,7 +10,11 @@ export async function getFilteredHousingData(minPrice, maxPrice) {
       percentage,
       housing_types (name),
       states (name),
-      municipalities (name)
+      municipalities (name),
+      tag,
+      url,
+      longitude,
+      latitude
     `);
 
   if (minPrice !== undefined && minPrice !== null) {
@@ -35,5 +39,10 @@ export async function getFilteredHousingData(minPrice, maxPrice) {
     type: item.housing_types ? item.housing_types.name : null,
     state_name: item.states ? item.states.name : null,
     mun_name: item.municipalities ? item.municipalities.name : null,
+    assets: {
+      tag: item.tag,
+      url: item.url
+    },
+    coordinates: [item.longitude, item.latitude]
   }));
 }
