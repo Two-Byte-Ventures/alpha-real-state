@@ -5,8 +5,8 @@ import { FaDollarSign } from "react-icons/fa";
 import useSourcesStore from "../stores/useSourcesStore"; // Added
 
 export default function PriceFilter({ minPrice = 500000, maxPrice = 50000000 }) { // Removed onPriceChange
-  const MIN_PRICE = 100000;
-  const MAX_PRICE = 10000000;
+  const MIN_PRICE = 1000000;
+  const MAX_PRICE = 20000000;
 
   // Get setPriceRange from the store
   const { priceRange: storePriceRange, setPriceRange: setStorePriceRange } = useSourcesStore();
@@ -49,7 +49,7 @@ export default function PriceFilter({ minPrice = 500000, maxPrice = 50000000 }) 
     <div className="absolute top-4 right-4 bg-white p-2.5 rounded-full shadow-lg z-20 flex items-center space-x-3 w-auto min-w-[300px] max-w-sm"> {/* Adjusted padding, rounded-full, and width */}
       {/* Icon */}
       <div className="bg-black rounded-full p-2 flex-shrink-0">
-        <FaDollarSign size={18} className="text-white" /> {/* Adjusted icon size slightly */}
+        <FaDollarSign size={18} className="text-white" /> {/* Adjusted icon size */}
       </div>
 
       {/* Min Value Label */}
@@ -63,6 +63,14 @@ export default function PriceFilter({ minPrice = 500000, maxPrice = 50000000 }) 
         maxValue={MAX_PRICE}
         value={currentSliderValue} // Use local state for slider value
         onChange={handleSliderChange}
+        showTooltip={true}
+        tooltipProps={{
+          classNames: {
+            arrow: "bg-black text-black border-black", // Tooltip arrow styling
+            content: "text-white bg-black", // Tooltip styling
+          },
+          showArrow: false, // Hide default arrow
+        }}
         classNames={{
           base: "flex-grow px-1", // Slider takes up available space
           trackWrapper: "h-1.5", // Adjusted track height
