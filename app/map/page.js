@@ -9,6 +9,7 @@ import useMap from "./useMap";
 import useSourcesStore from "../stores/useSourcesStore";
 import useMarkers from "./useMarkers";
 import PriceFilter from "./PriceFilter";
+import HousingTypeFilter from "./HousingTypeFilter";
 
 export default function Page() {
   const {
@@ -143,6 +144,7 @@ export default function Page() {
       />
 
       <PriceFilter />
+      <HousingTypeFilter />
 
       <Script
         src="https://product-gallery.cloudinary.com/latest/all.js"

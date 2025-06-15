@@ -28,8 +28,8 @@ export const Card = ({ type }) => {
       ></div>
 
       <div className="bg-white items-center py-2 md:py-3 lg:py-4 flex justify-center z-10 rounded-b-lg text-base md:text-lg lg:text-xl">
-        {type==="commercial" && <Plaza className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"/>}
-        {type==="residential" && <House className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"/>}
+        {type==="plaza" && <Plaza className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"/>}
+        {type==="house" && <House className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"/>}
         {type==="industrial" && <Industrial className="xs:mr-1 sm:mr-2 md:mr-3 lg:mr-4"/>}
         <span className="pl-1">{isClient && t(`types.${type}`)}</span>
       </div>

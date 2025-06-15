@@ -1,6 +1,6 @@
 import supabase from '@/lib/supabaseClient'; // Assuming @/ maps to your project root or src/
 
-export async function getFilteredHousingData(minPrice, maxPrice) {
+export async function getFilteredHousingData(minPrice, maxPrice, housingTypeFilters) {
   let query = supabase
     .from('housing')
     .select(`
@@ -14,7 +14,8 @@ export async function getFilteredHousingData(minPrice, maxPrice) {
       tag,
       url,
       longitude,
-      latitude
+      latitude,
+      housing_type_id
     `);
 
   if (minPrice !== undefined && minPrice !== null) {
@@ -22,6 +23,19 @@ export async function getFilteredHousingData(minPrice, maxPrice) {
   }
   if (maxPrice !== undefined && maxPrice !== null) {
     query = query.lte('price', maxPrice);
+  }
+
+  if (housingTypeFilters && housingTypeFilters.length > 0) {
+    const typeIds = housingTypeFilters.map(type => {
+      if (type === 'house') return 1;
+      if (type === 'plaza') return 2;
+      if (type === 'industrial') return 3;
+      return null;
+    }).filter(id => id !== null);
+
+    if (typeIds.length > 0) {
+      query = query.in('housing_type_id', typeIds);
+    }
   }
 
   const { data, error } = await query;

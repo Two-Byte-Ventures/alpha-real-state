@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import statesGeoJSONData from '@/geojson/states.json';
 import municipalitiesGeoJSONData from '@/geojson/municipalities.json';
-import { getFilteredHousingData } from '../services/housingService'; // Adjusted import
+import { getFilteredHousingData } from '../services/housingService';
 
 const allStateNames = statesGeoJSONData.features.map(
   (state) => state.properties.state_name
@@ -20,6 +20,7 @@ const useSourcesStore = create((set, get) => ({
   filteredStateNames: [],
   filteredMunNames: [],
   housingData: [], // Added to store fetched housing data
+  housingTypeFilters: ["house", "plaza", "industrial"], // Initialize with all types selected
 
   setPriceRange: (newPriceRange) => {
     set({ priceRange: newPriceRange });
@@ -27,13 +28,13 @@ const useSourcesStore = create((set, get) => ({
   },
 
   fetchFilteredData: async () => {
-    const { priceRange } = get(); // Get current priceRange from store
+    const { priceRange, housingTypeFilters } = get(); // Get current priceRange and housingTypeFilters from store
     try {
       const minPrice = priceRange && typeof priceRange[0] === 'number' ? priceRange[0] : undefined;
       const maxPrice = priceRange && typeof priceRange[1] === 'number' ? priceRange[1] : undefined;
 
-      // Fetch detailed housing data instead of just names
-      const fetchedHousingData = await getFilteredHousingData(minPrice, maxPrice);
+      // Fetch detailed housing data with all filters
+      const fetchedHousingData = await getFilteredHousingData(minPrice, maxPrice, housingTypeFilters);
       
       // Extract state and municipality names from the fetched housing data
       const fetchedDbStateNames = [...new Set(fetchedHousingData.map(item => item.state_name).filter(name => name))];
@@ -66,10 +67,21 @@ const useSourcesStore = create((set, get) => ({
   },
   
   // Action to initialize data fetching
-  initializeSources: () => {
+  initializeSources: async () => {
     // Call fetchFilteredData on initialization
-    get().fetchFilteredData();
-  }
+    await get().fetchFilteredData();
+  },
+
+  // Action to toggle a housing type filter
+  toggleHousingTypeFilter: (type) => {
+    set((state) => {
+      const newFilters = state.housingTypeFilters.includes(type)
+        ? state.housingTypeFilters.filter((t) => t !== type)
+        : [...state.housingTypeFilters, type];
+      return { housingTypeFilters: newFilters };
+    });
+    get().fetchFilteredData(); // Re-fetch data when housing type filters change
+  },
 }));
 
 export default useSourcesStore;
