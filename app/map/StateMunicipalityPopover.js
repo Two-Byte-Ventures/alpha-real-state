@@ -1,27 +1,20 @@
-import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 import HousingOverview from "@/app/_components/HousingOverview";
+import GenericPopover from "@/app/_components/GenericPopover";
 
-export default function StateMunicipalityPopover({ clickedFeatureInfo, popoverPlacement }) {
+export default function StateMunicipalityPopover({ clickedFeatureInfo, popoverPlacement, onClose }) {
+  const isOpen = Boolean(clickedFeatureInfo && ['states', 'municipalities'].includes(clickedFeatureInfo.layerId));
+
   return (
-    <Popover
-      placement={popoverPlacement}
-      isOpen={Boolean(clickedFeatureInfo && ['states', 'municipalities'].includes(clickedFeatureInfo.layerId))}
+    <GenericPopover
+      isOpen={isOpen}
+      clickedFeatureInfo={clickedFeatureInfo}
+      popoverPlacement={popoverPlacement}
+      onClose={onClose}
     >
-      <PopoverTrigger>
-        <div
-          style={{
-            position: "absolute",
-            left: clickedFeatureInfo?.x || 0,
-            top: clickedFeatureInfo?.y || 0,
-          }}
-        />
-      </PopoverTrigger>
-      <PopoverContent>
-        <HousingOverview
-          stateName={clickedFeatureInfo?.feature?.properties?.state_name}
-          munName={clickedFeatureInfo?.feature?.properties?.mun_name}
-        />
-      </PopoverContent>
-    </Popover>
+      <HousingOverview
+        stateName={clickedFeatureInfo?.feature?.properties?.state_name}
+        munName={clickedFeatureInfo?.feature?.properties?.mun_name}
+      />
+    </GenericPopover>
   );
 }

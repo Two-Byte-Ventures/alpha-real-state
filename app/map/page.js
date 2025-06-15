@@ -21,6 +21,7 @@ export default function Page() {
     onLoadHandler,
     onDblClickHandler,
     onClickHandler,
+    setClickedFeatureInfo,
   } = useMap();
 
   const {
@@ -36,6 +37,10 @@ export default function Page() {
   useEffect(() => {
     initializeSources();
   }, [initializeSources]);
+
+  const handleClosePopover = () => {
+    setClickedFeatureInfo(null);
+  };
 
   return (
     <Map
@@ -136,11 +141,13 @@ export default function Page() {
       <StateMunicipalityPopover
         clickedFeatureInfo={clickedFeatureInfo}
         popoverPlacement={popoverPlacement}
+        onClose={handleClosePopover}
       />
 
       <MarkerPopover
         clickedFeatureInfo={clickedFeatureInfo}
         popoverPlacement={popoverPlacement}
+        onClose={handleClosePopover}
       />
 
       <PriceFilter />
