@@ -14,8 +14,8 @@ const i18n = rosetta({
     types: {
       title: "Tipos de Inversión",
       industrial: "Nave Industrial",
-      commercial: "Plaza Comercial",
-      residential: "Casa Residencial",
+      plaza: "Plaza Comercial",
+      house: "Casa Residencial",
     },
     housing: {
       from: "desde",
@@ -33,8 +33,8 @@ const i18n = rosetta({
     types: {
       title: "Investment Types",
       industrial: "Industrial Warehouse",
-      commercial: "Commercial Plaza",
-      residential: "Residential House",
+      plaza: "Commercial Plaza",
+      house: "Residential House",
     },
     housing: {
       from: "from",

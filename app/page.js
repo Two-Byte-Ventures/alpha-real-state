@@ -9,7 +9,7 @@ export default function Page() {
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const { t } = useTranslations();
-  const cardTypes = ["industrial", "commercial", "residential"];
+  const cardTypes = ["industrial", "plaza", "house"];
 
   const handleClick = () => {
     router.push("/map");
