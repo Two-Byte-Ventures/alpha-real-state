@@ -118,4 +118,51 @@ INSERT INTO housing (id, name, housing_type_id, percentage, price, country_id, s
   'mx/qro/parque_industrial'
 );
 
+-- 5. Create amenity_types table
+-- Stores different types of amenities (e.g., bathroom, parking, gym, pool, etc.)
+CREATE TABLE amenity_types (
+  id INTEGER PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL
+);
+
+-- Insert initial amenity types
+INSERT INTO amenity_types (id, name) VALUES (1, 'total_area') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (2, 'constructed_area') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (3, 'bathroom') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (4, 'parking_space') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (5, 'room') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (6, 'years_built') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (7, 'gym') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (8, 'pool') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (9, 'clubhouse') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (10, 'controlled_access') ON CONFLICT (name) DO NOTHING;
+INSERT INTO amenity_types (id, name) VALUES (11, 'terrace') ON CONFLICT (name) DO NOTHING;
+
+-- 6. Create housing_amenities table
+-- Stores the relationship between housing and its amenities
+CREATE TABLE housing_amenities (
+  id INTEGER PRIMARY KEY,
+  housing_id INTEGER NOT NULL REFERENCES housing(id) ON DELETE CASCADE,
+  amenity_type_id INTEGER NOT NULL REFERENCES amenity_types(id),
+  value REAL, -- Can be fractional for area, integer for count
+  UNIQUE (housing_id, amenity_type_id)
+);
+
+INSERT INTO housing_amenities (id, housing_id, amenity_type_id, value) VALUES
+(1, 1, 1, 200.0),
+(2, 1, 2, 150.0),
+(3, 1, 3, 3.0),
+(4, 1, 4, 2.0),
+(5, 1, 5, 4.0),
+(6, 1, 6, 5.0),
+(7, 2, 1, 300.0),
+(8, 2, 2, 250.0),
+(9, 2, 3, 4.0),
+(10, 2, 4, 3.0),
+(11, 2, 5, 5.0),
+(12, 2, 7, NULL),
+(13, 2, 8, NULL),
+(14, 3, 1, 100),
+(15, 3, 2, 120);
+
 COMMIT;
