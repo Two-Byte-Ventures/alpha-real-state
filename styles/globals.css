@@ -29,4 +29,12 @@
   [data-slot="base"][data-color="primary"] {
     @apply bg-black text-white hover:bg-gray-800 focus:bg-gray-800 data-[pressed=true]:bg-gray-900;
   }
+  
+  /* Hide Mapbox attribution and labels */
+  .mapbox-no-attribution .mapboxgl-ctrl-attrib,
+  .mapbox-no-attribution .mapboxgl-ctrl-logo,
+  .mapbox-no-attribution .mapboxgl-ctrl-bottom-right,
+  .mapbox-no-attribution .mapboxgl-ctrl-bottom-left {
+    display: none !important;
+  }
 }

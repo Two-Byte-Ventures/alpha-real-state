@@ -46,7 +46,7 @@ export default function Page() {
   return (
     <Map
       ref={mapRef}
-      className="w-full h-screen flex justify-center items-center relative"
+      className="w-full h-screen flex justify-center items-center relative mapbox-no-attribution"
       mapboxAccessToken={mapboxToken}
       initialViewState={{
         longitude: -100.668,
@@ -60,6 +60,7 @@ export default function Page() {
       onClick={onClickHandler}
       onDblClick={onDblClickHandler}
       doubleClickZoom={false}
+      attributionControl={false}
     >
       {isMapLoaded && [
         <Source key="statesSource" type="geojson" data={statesGeoJSON}>

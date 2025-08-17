@@ -4,11 +4,14 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input
 import { Plus } from "@/app/_components/Icons";
 import { useTranslations } from "@/app/hooks/use-translations";
 import useSourcesStore from "../stores/useSourcesStore";
+import MapCoordinatePicker from "./MapCoordinatePicker";
 
 const AddHousingControl = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { addHousingItem, statesGeoJSON, municipalitiesGeoJSON } = useSourcesStore();
   const { t } = useTranslations();
+  
+  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
   
   const [formData, setFormData] = useState({
     name: "",
@@ -76,6 +79,14 @@ const AddHousingControl = () => {
       ...prev,
       state_name: stateName,
       mun_name: "" // Clear municipality when state changes
+    }));
+  };
+
+  const handleCoordinatesChange = ({ longitude, latitude }) => {
+    setFormData(prev => ({
+      ...prev,
+      longitude: longitude.toString(),
+      latitude: latitude.toString()
     }));
   };
 
@@ -227,24 +238,6 @@ const AddHousingControl = () => {
                     ))}
                   </Select>
                   <Input
-                    label={t("housing.longitude")}
-                    placeholder={t("housing.longitudePlaceholder")}
-                    type="number"
-                    step="any"
-                    value={formData.longitude}
-                    onValueChange={(value) => handleInputChange("longitude", value)}
-                    isRequired
-                  />
-                  <Input
-                    label={t("housing.latitude")}
-                    placeholder={t("housing.latitudePlaceholder")}
-                    type="number"
-                    step="any"
-                    value={formData.latitude}
-                    onValueChange={(value) => handleInputChange("latitude", value)}
-                    isRequired
-                  />
-                  <Input
                     label={t("housing.tag")}
                     placeholder={t("housing.tagPlaceholder")}
                     value={formData.tag}
@@ -255,6 +248,19 @@ const AddHousingControl = () => {
                     placeholder={t("housing.urlPlaceholder")}
                     value={formData.url}
                     onValueChange={(value) => handleInputChange("url", value)}
+                  />
+                </div>
+                
+                {/* Map Coordinate Picker */}
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t("housing.coordinates")} *
+                  </label>
+                  <MapCoordinatePicker
+                    longitude={parseFloat(formData.longitude) || null}
+                    latitude={parseFloat(formData.latitude) || null}
+                    onCoordinatesChange={handleCoordinatesChange}
+                    mapboxToken={mapboxToken}
                   />
                 </div>
                 

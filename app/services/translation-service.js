@@ -40,6 +40,7 @@ const i18n = rosetta({
       latitudePlaceholder: "Ingresa la latitud",
       longitude: "Longitud",
       longitudePlaceholder: "Ingresa la longitud",
+      coordinates: "Coordenadas",
       tag: "Etiqueta",
       tagPlaceholder: "Ingresa una etiqueta única",
       url: "URL",
@@ -48,6 +49,8 @@ const i18n = rosetta({
       save: "Guardar",
       required: "Campo requerido",
       invalidCoordinates: "Coordenadas inválidas",
+      centerMap: "Centrar",
+      mapPickerInstructions: "Haz clic en el mapa o arrastra el marcador para seleccionar las coordenadas",
     },
   },
   en: {
@@ -88,6 +91,7 @@ const i18n = rosetta({
       latitudePlaceholder: "Enter latitude",
       longitude: "Longitude",
       longitudePlaceholder: "Enter longitude",
+      coordinates: "Coordinates",
       tag: "Tag",
       tagPlaceholder: "Enter a unique tag",
       url: "URL",
@@ -96,6 +100,8 @@ const i18n = rosetta({
       save: "Save",
       required: "Required field",
       invalidCoordinates: "Invalid coordinates",
+      centerMap: "Center",
+      mapPickerInstructions: "Click on the map or drag the marker to select coordinates",
     },
   },
 });
