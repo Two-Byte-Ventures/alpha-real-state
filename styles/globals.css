@@ -17,4 +17,16 @@
     font-display: swap;
     src: url(../fonts/Jockey_One/JockeyOne-Regular.ttf) format('truetype');
   }
+}
+
+@layer components {
+  /* Black theme policy - Default button styles */
+  .btn-primary {
+    @apply bg-black text-white hover:bg-gray-800 focus:bg-gray-800 active:bg-gray-900 transition-colors duration-200;
   }
+  
+  /* Override NextUI primary button defaults to use black theme */
+  [data-slot="base"][data-color="primary"] {
+    @apply bg-black text-white hover:bg-gray-800 focus:bg-gray-800 data-[pressed=true]:bg-gray-900;
+  }
+}

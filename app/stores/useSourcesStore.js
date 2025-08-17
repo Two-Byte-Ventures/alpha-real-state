@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import statesGeoJSONData from '@/geojson/states.json';
 import municipalitiesGeoJSONData from '@/geojson/municipalities.json';
-import { getFilteredHousingData } from '../services/housingService';
+import { getFilteredHousingData, getHousingDataById, addHousingItem as addHousingItemService } from '../services/housingService';
 
 const allStateNames = statesGeoJSONData.features.map(
   (state) => state.properties.state_name
@@ -21,6 +21,7 @@ const useSourcesStore = create((set, get) => ({
   filteredMunNames: [],
   housingData: [], // Added to store fetched housing data
   housingTypeFilters: ["house", "plaza", "industrial"], // Initialize with all types selected
+  currentHousing: null, // Added to store the currently selected housing
 
   setPriceRange: (newPriceRange) => {
     set({ priceRange: newPriceRange });
@@ -82,6 +83,28 @@ const useSourcesStore = create((set, get) => ({
     });
     get().fetchFilteredData(); // Re-fetch data when housing type filters change
   },
+
+  fetchHousingById: async (id) => {
+    try {
+      const housing = await getHousingDataById(id);
+      set({ currentHousing: housing });
+    } catch (error) {
+      console.error("Failed to fetch housing data by ID:", error);
+      set({ currentHousing: null });
+    }
+  },
+
+  addHousingItem: async (housingData) => {
+    try {
+      const newHousing = await addHousingItemService(housingData);
+      // Refresh the filtered data to include the new item
+      await get().fetchFilteredData();
+      return newHousing;
+    } catch (error) {
+      console.error("Failed to add housing item:", error);
+      throw error;
+    }
+  }
 }));
 
 export default useSourcesStore;

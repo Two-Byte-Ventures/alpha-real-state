@@ -10,6 +10,7 @@ import useSourcesStore from "../stores/useSourcesStore";
 import useMarkers from "./useMarkers";
 import PriceFilter from "./PriceFilter";
 import HousingTypeFilter from "./HousingTypeFilter";
+import AddHousingControl from "./AddHousingControl";
 
 export default function Page() {
   const {
@@ -152,6 +153,7 @@ export default function Page() {
 
       <PriceFilter />
       <HousingTypeFilter />
+      <AddHousingControl />
 
       <Script
         src="https://product-gallery.cloudinary.com/latest/all.js"

@@ -4,6 +4,12 @@ ON public.housing
 FOR SELECT TO anon
 USING (true);
 
+-- Allow public insert access to housing
+CREATE POLICY "Public can insert housing"
+ON public.housing
+FOR INSERT TO anon
+WITH CHECK (true);
+
 -- Allow read access to all countries
 CREATE POLICY "Allow read access to all countries"
 ON countries

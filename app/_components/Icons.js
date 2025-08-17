@@ -6,6 +6,7 @@ import {
   FaIndustry,
   FaLocationDot,
   FaMap,
+  FaPlus,
   FaRegImage,
   FaStore,
   FaWhatsapp,
@@ -78,4 +79,8 @@ export function Whatsapp({ size = 25, number = null, message = '', ...props }) {
     );
   }
   return <FaWhatsapp size={size} {...props} />;
+}
+
+export function Plus({ size = 25, ...props }) {
+  return <FaPlus size={size} {...props} />;
 }
