@@ -5,7 +5,9 @@ import {
   FaHouse,
   FaIndustry,
   FaLocationDot,
+  FaLocationCrosshairs,
   FaMap,
+  FaMapPin,
   FaPlus,
   FaRegImage,
   FaStore,
@@ -64,6 +66,14 @@ export function Location({ size = 25, coordinates = null, ...props }) {
     );
   }
   return <FaLocationDot size={size} {...props} />;
+}
+
+export function Center({ size = 25, ...props }) {
+  return <FaLocationCrosshairs size={size} {...props} />;
+}
+
+export function Coordinates({ size = 25, ...props }) {
+  return <FaMapPin size={size} {...props} />;
 }
 
 export function Whatsapp({ size = 25, number = null, message = '', ...props }) {

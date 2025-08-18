@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Select, SelectItem, useDisclosure } from "@nextui-org/react";
 import { CldUploadWidget } from 'next-cloudinary';
 import Image from 'next/image';
-import { Plus } from "@/app/_components/Icons";
+import { Plus, Brochure, Coordinates, Picture, House } from "@/app/_components/Icons";
 import { useTranslations } from "@/app/hooks/use-translations";
 import useSourcesStore from "../stores/useSourcesStore";
 import MapCoordinatePicker from "./MapCoordinatePicker";
@@ -27,6 +27,9 @@ const AddHousingControl = () => {
     tag: "",
     url: ""
   });
+  
+  const [isStateAutoResolved, setIsStateAutoResolved] = useState(false);
+  const [isMunicipalityAutoResolved, setIsMunicipalityAutoResolved] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -140,12 +143,122 @@ const AddHousingControl = () => {
     }));
   };
 
-  const handleCoordinatesChange = ({ longitude, latitude }) => {
+  const handleCoordinatesChange = async ({ longitude, latitude }) => {
     setFormData(prev => ({
       ...prev,
       longitude: longitude.toString(),
       latitude: latitude.toString()
     }));
+
+    // Resolve state and municipality from coordinates
+    try {
+      const geoResponse = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxToken}&types=region,place&country=mx`
+      );
+      
+      if (geoResponse.ok) {
+        const geoData = await geoResponse.json();
+        const features = geoData.features || [];
+        
+        // Find state (region) and municipality (place)
+        const stateFeature = features.find(f => f.place_type?.includes('region'));
+        const municipalityFeature = features.find(f => f.place_type?.includes('place'));
+        
+        if (stateFeature && municipalityFeature) {
+          const geocodedStateName = stateFeature.text;
+          const geocodedMunicipalityName = municipalityFeature.text;
+          
+          console.log('Resolved location:', {
+            state: geocodedStateName,
+            municipality: geocodedMunicipalityName
+          });
+          
+          // Find matching state in our data using flexible matching
+          const matchingState = statesGeoJSON.features.find(state => {
+            const stateName = state.properties.state_name;
+            // Check for exact match first, then partial match
+            return stateName === geocodedStateName || 
+                   stateName.includes(geocodedStateName) || 
+                   geocodedStateName.includes(stateName);
+          });
+          
+          // Find matching municipality in our data using flexible matching
+          const matchingMunicipality = municipalitiesGeoJSON.features.find(mun => {
+            const munName = mun.properties.mun_name;
+            // Check for exact match first, then partial match
+            return munName === geocodedMunicipalityName || 
+                   munName.includes(geocodedMunicipalityName) || 
+                   geocodedMunicipalityName.includes(munName);
+          });
+          
+          if (matchingState && matchingMunicipality) {
+            console.log('Found matching state and municipality:', {
+              state: matchingState.properties.state_name,
+              municipality: matchingMunicipality.properties.mun_name
+            });
+            
+            setFormData(prev => ({
+              ...prev,
+              longitude: longitude.toString(),
+              latitude: latitude.toString(),
+              state_name: matchingState.properties.state_name,
+              mun_name: matchingMunicipality.properties.mun_name
+            }));
+            
+            setIsStateAutoResolved(true);
+            setIsMunicipalityAutoResolved(true);
+          } else if (matchingState && !matchingMunicipality) {
+            console.log('Found state but not municipality:', {
+              state: matchingState.properties.state_name,
+              geocodedMunicipality: geocodedMunicipalityName
+            });
+            
+            setFormData(prev => ({
+              ...prev,
+              longitude: longitude.toString(),
+              latitude: latitude.toString(),
+              state_name: matchingState.properties.state_name,
+              mun_name: ""
+            }));
+            
+            setIsStateAutoResolved(true);
+            setIsMunicipalityAutoResolved(false);
+          } else {
+            console.log('Could not find matching state and municipality in our data', {
+              stateFound: !!matchingState,
+              municipalityFound: !!matchingMunicipality,
+              geocodedState: geocodedStateName,
+              geocodedMunicipality: geocodedMunicipalityName
+            });
+            
+            setFormData(prev => ({
+              ...prev,
+              longitude: longitude.toString(),
+              latitude: latitude.toString(),
+              state_name: "",
+              mun_name: ""
+            }));
+            
+            setIsStateAutoResolved(false);
+            setIsMunicipalityAutoResolved(false);
+          }
+        } else {
+          // No location found, enable manual selection
+          setIsStateAutoResolved(false);
+          setIsMunicipalityAutoResolved(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error resolving location from coordinates:', error);
+      // Still update coordinates even if geocoding fails
+      setFormData(prev => ({
+        ...prev,
+        longitude: longitude.toString(),
+        latitude: latitude.toString()
+      }));
+      setIsStateAutoResolved(false);
+      setIsMunicipalityAutoResolved(false);
+    }
   };
 
   const resetForm = () => {
@@ -165,6 +278,8 @@ const AddHousingControl = () => {
     const emptyData = { folder: '', tag: '' };
     setCloudinaryData(emptyData); // Clear cloudinary data
     cloudinaryDataRef.current = emptyData; // Clear ref as well
+    setIsStateAutoResolved(false);
+    setIsMunicipalityAutoResolved(false);
     setError(null);
     setSuccess(false);
   };
@@ -222,8 +337,9 @@ const AddHousingControl = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
-                {t("housing.addNew")}
+              <ModalHeader className="flex items-center gap-3 px-6 py-4">
+                <House size={20} />
+                <span className="text-lg font-semibold">{t("housing.addNew")}</span>
               </ModalHeader>
               <ModalBody>
                 {error && (
@@ -273,12 +389,29 @@ const AddHousingControl = () => {
                     value={formData.percentage}
                     onValueChange={(value) => handleInputChange("percentage", value)}
                   />
+                  
+                  {/* Map Coordinate Picker - moved before state selection */}
+                  <div className="md:col-span-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                      <Coordinates size={16} className="text-gray-600" />
+                      {t("housing.coordinates")} *
+                    </label>
+                    <MapCoordinatePicker
+                      longitude={parseFloat(formData.longitude) || null}
+                      latitude={parseFloat(formData.latitude) || null}
+                      onCoordinatesChange={handleCoordinatesChange}
+                      mapboxToken={mapboxToken}
+                    />
+                  </div>
+                  
                   <Select
                     label={t("housing.state")}
                     placeholder={t("housing.statePlaceholder")}
                     selectedKeys={formData.state_name ? [formData.state_name] : []}
                     onSelectionChange={(keys) => handleStateChange(Array.from(keys)[0] || "")}
                     isRequired
+                    isDisabled={isStateAutoResolved}
+                    description={isStateAutoResolved ? "Auto-resolved from map coordinates" : undefined}
                   >
                     {stateOptions.map((state) => (
                       <SelectItem key={state.key} value={state.key}>
@@ -292,7 +425,8 @@ const AddHousingControl = () => {
                     selectedKeys={formData.mun_name ? [formData.mun_name] : []}
                     onSelectionChange={(keys) => handleInputChange("mun_name", Array.from(keys)[0] || "")}
                     isRequired
-                    isDisabled={!formData.state_name}
+                    isDisabled={!formData.state_name || isMunicipalityAutoResolved}
+                    description={isMunicipalityAutoResolved ? "Auto-resolved from map coordinates" : undefined}
                   >
                     {municipalityOptions.map((municipality) => (
                       <SelectItem key={municipality.key} value={municipality.key}>
@@ -300,33 +434,12 @@ const AddHousingControl = () => {
                       </SelectItem>
                     ))}
                   </Select>
-                  <Input
-                    label={t("housing.tag")}
-                    placeholder={t("housing.tagPlaceholder")}
-                    value={formData.tag}
-                    onValueChange={(value) => handleInputChange("tag", value)}
-                    isReadOnly={true}
-                    isDisabled={true}
-                    variant="flat"
-                    color="default"
-                    classNames={{
-                      input: "text-gray-400 cursor-not-allowed",
-                      inputWrapper: "bg-gray-100 border-gray-200 opacity-60",
-                      label: "text-gray-400"
-                    }}
-                    description={t("housing.tagAutoGenerated")}
-                  />
-                  <Input
-                    label={t("housing.url")}
-                    placeholder={t("housing.urlPlaceholder")}
-                    value={formData.url}
-                    onValueChange={(value) => handleInputChange("url", value)}
-                  />
                 </div>
                 
                 {/* Image Upload Section */}
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                    <Picture size={16} className="text-gray-600" />
                     {t("housing.images")} *
                   </label>
                   
@@ -370,13 +483,6 @@ const AddHousingControl = () => {
                     {({ open }) => {
                       return (
                         <div className="space-y-2">
-                          {/* Debug info */}
-                          {cloudinaryData.folder && (
-                            <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
-                              <strong>Debug:</strong> Folder: {cloudinaryData.folder}, Tag: {cloudinaryData.tag}
-                            </div>
-                          )}
-                          
                           <button
                             type="button"
                             onClick={() => {
@@ -424,28 +530,25 @@ const AddHousingControl = () => {
                             ))}
                           </div>
                         )}
-                        
-                        {uploadedImages.length > 0 && (
-                          <p className="text-sm text-green-600">
-                            {uploadedImages.length} image(s) uploaded to: {cloudinaryData.folder || "housing_app/temp"}
-                          </p>
-                        )}
                         </div>
                       );
                     }}
                   </CldUploadWidget>
                 </div>
                 
-                {/* Map Coordinate Picker */}
+                {/* PDF Brochure URL - moved to last position */}
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t("housing.coordinates")} *
-                  </label>
-                  <MapCoordinatePicker
-                    longitude={parseFloat(formData.longitude) || null}
-                    latitude={parseFloat(formData.latitude) || null}
-                    onCoordinatesChange={handleCoordinatesChange}
-                    mapboxToken={mapboxToken}
+                  <Input
+                    label={t("housing.url")}
+                    placeholder={t("housing.urlPlaceholder")}
+                    value={formData.url}
+                    onValueChange={(value) => handleInputChange("url", value)}
+                    startContent={
+                      <div className="pointer-events-none flex items-center">
+                        <Brochure size={18} className="text-default-400" />
+                      </div>
+                    }
+                    description={t("housing.urlDescription")}
                   />
                 </div>
                 

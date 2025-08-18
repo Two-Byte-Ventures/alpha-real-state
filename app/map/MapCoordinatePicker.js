@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Map, { Source, Layer } from "react-map-gl";
 import { Button } from "@nextui-org/react";
+import { Center } from "@/app/_components/Icons";
 import { useTranslations } from "@/app/hooks/use-translations";
 
 const MapCoordinatePicker = ({ 
@@ -120,22 +121,15 @@ const MapCoordinatePicker = ({
           )}
         </Map>
         
-        {/* Coordinates display and center button */}
-        <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-md">
-          <div className="text-xs text-gray-600 space-y-1">
-            <div>Lat: {markerPosition.latitude ? Number(markerPosition.latitude).toFixed(6) : 'N/A'}</div>
-            <div>Lng: {markerPosition.longitude ? Number(markerPosition.longitude).toFixed(6) : 'N/A'}</div>
-          </div>
-        </div>
-        
         <div className="absolute top-2 right-2">
           <Button
             size="sm"
             variant="flat"
             className="bg-white/90 backdrop-blur-sm"
             onPress={centerMapOnMarker}
+            startContent={<Center size={16} />}
           >
-            📍 {t("housing.centerMap")}
+            {t("housing.centerMap")}
           </Button>
         </div>
       </div>
