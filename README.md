@@ -14,12 +14,14 @@ Alpha Real Estate is a web application for browsing real estate listings. It fea
 - **Internationalization:** [Rosetta](https://github.com/lukeed/rosetta)
 - **Backend/DB:** [Supabase](https://supabase.io/)
 - **Icons:** [React Icons](https://react-icons.github.io/react-icons/)
+- **Image Management:** [Cloudinary](https://cloudinary.com/) with [Next Cloudinary](https://next.cloudinary.dev/)
 
 ## Key Features
 
 - **Interactive Map:** Users can browse properties on an interactive map.
 - **Filtering:** Properties can be filtered by type and price.
 - **Detailed Views:** Each property has a detailed view with more information.
+- **Image Management:** Automated property image upload and organization using Cloudinary.
 - **Localization:** The application supports multiple languages.
 - **Component-Based Architecture:** The frontend is built with reusable React components.
 
@@ -34,12 +36,15 @@ The project follows a standard Next.js `app` directory structure. Key directorie
 
 ## Getting Started
 
-First, you'll need to set up your environment variables. Create a `.env.local` file in the root of the project and add your Supabase credentials:
+First, you'll need to set up your environment variables. Create a `.env.local` file in the root of the project and add your Supabase and Cloudinary credentials:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
 ```
+
+**Important:** For image upload functionality, you'll also need to set up Cloudinary. See `CLOUDINARY_SETUP.md` for detailed instructions on configuring your Cloudinary account and upload presets.
 
 Then, run the development server:
 

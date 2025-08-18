@@ -4,9 +4,14 @@ import { useEffect } from "react";
 
 function HouseDetails({ name, tag }) {
   useEffect(() => {
+    if (!tag) {
+      console.warn('No tag provided for HouseDetails gallery');
+      return;
+    }
+
     const photoGallery = cloudinary.galleryWidget({
       container: '#photo-gallery',
-      cloudName: `${process.env.NEXT_PUBLIC_CLOUDINARY_APP_NAME}`,
+      cloudName: `${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}`,
       mediaAssets: [
         { tag: tag, mediaType: 'image'},
       ],
@@ -33,7 +38,7 @@ function HouseDetails({ name, tag }) {
       photoGallery.render();
     }, 500);
 
-  }, []);
+  }, [tag]);
   return (
     <div className="flex flex-col justify-between items-center flex-grow">
       <h1 className="font-sans text-2xl mb-3 text-violet-700 font-bold">
