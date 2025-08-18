@@ -36,9 +36,57 @@ const AddHousingControl = () => {
   const [success, setSuccess] = useState(false);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [cloudinaryData, setCloudinaryData] = useState({ folder: '', tag: '' });
+  const [urlError, setUrlError] = useState(null);
+  const [isValidatingUrl, setIsValidatingUrl] = useState(false);
   
   // Use ref to store current cloudinary data to avoid closure issues
   const cloudinaryDataRef = useRef({ folder: '', tag: '' });
+
+  // PDF URL validation function
+  const validatePdfUrl = async (url) => {
+    if (!url.trim()) {
+      setUrlError(null);
+      return true; // Empty URL is valid (optional field)
+    }
+
+    // Basic URL format validation
+    const urlPattern = /^https?:\/\/.+/i;
+    if (!urlPattern.test(url)) {
+      setUrlError(t("housing.urlInvalidFormat"));
+      return false;
+    }
+
+    // Check if URL ends with .pdf (case insensitive)
+    const pdfPattern = /\.pdf(\?.*)?$/i;
+    if (!pdfPattern.test(url)) {
+      setUrlError(t("housing.urlMustBePdf"));
+      return false;
+    }
+
+    setIsValidatingUrl(true);
+    setUrlError(null);
+
+    try {
+      // Validate that the URL actually points to an accessible PDF
+      const response = await fetch(url, { 
+        method: 'HEAD',
+        mode: 'no-cors' // Handle CORS issues
+      });
+      
+      // Since we're using no-cors, we can't read the response
+      // but we can check if the request succeeded
+      setUrlError(null);
+      return true;
+    } catch (error) {
+      // For CORS-blocked requests or network errors, 
+      // we'll only validate the URL format and extension
+      console.warn('URL validation limited due to CORS:', error);
+      setUrlError(null);
+      return true;
+    } finally {
+      setIsValidatingUrl(false);
+    }
+  };
 
   // Generate Cloudinary data when state and municipality are selected
   useEffect(() => {
@@ -133,6 +181,18 @@ const AddHousingControl = () => {
       ...prev,
       [field]: value
     }));
+
+    // Validate URL field when it changes
+    if (field === 'url') {
+      // Debounce URL validation to avoid excessive API calls
+      if (value.trim()) {
+        setTimeout(() => {
+          validatePdfUrl(value);
+        }, 500);
+      } else {
+        setUrlError(null);
+      }
+    }
   };
 
   const handleStateChange = (stateName) => {
@@ -282,6 +342,8 @@ const AddHousingControl = () => {
     setIsMunicipalityAutoResolved(false);
     setError(null);
     setSuccess(false);
+    setUrlError(null);
+    setIsValidatingUrl(false);
   };
 
   const handleSubmit = async () => {
@@ -310,7 +372,7 @@ const AddHousingControl = () => {
   const isFormValid = formData.name && formData.price && formData.type && 
                      formData.state_name && formData.mun_name && 
                      formData.longitude && formData.latitude &&
-                     uploadedImages.length > 0;
+                     uploadedImages.length > 0 && !urlError && !isValidatingUrl;
 
   return (
     <>
@@ -548,7 +610,17 @@ const AddHousingControl = () => {
                         <Brochure size={18} className="text-default-400" />
                       </div>
                     }
-                    description={t("housing.urlDescription")}
+                    description={urlError ? undefined : t("housing.urlDescription")}
+                    errorMessage={urlError}
+                    isInvalid={!!urlError}
+                    validationState={urlError ? "invalid" : "valid"}
+                    endContent={
+                      isValidatingUrl ? (
+                        <div className="flex items-center">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                        </div>
+                      ) : null
+                    }
                   />
                 </div>
                 

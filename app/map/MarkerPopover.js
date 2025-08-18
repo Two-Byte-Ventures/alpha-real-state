@@ -44,7 +44,7 @@ export default function MarkerPopover({ clickedFeatureInfo, popoverPlacement, on
               lng: clickedFeatureInfo?.feature?.properties?.coordinates?.[0],
               lat: clickedFeatureInfo?.feature?.properties?.coordinates?.[1],
             }}
-            brochure={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/housing_app/${clickedFeatureInfo?.feature?.properties?.assets?.url}/brochure.pdf`}
+            brochure={clickedFeatureInfo?.feature?.properties?.assets?.url}
           />
         </CardFooter>
       </Card>

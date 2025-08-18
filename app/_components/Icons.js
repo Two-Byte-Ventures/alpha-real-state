@@ -42,15 +42,21 @@ export function Picture({ size = 25, ...props }) {
   return <FaRegImage size={size} {...props} />;
 }
 
-export function Brochure({ size = 25, url = null, ...props }) {
-  if (url) {
+export function Brochure({ size = 25, url = null, disabled = false, ...props }) {
+  const iconProps = {
+    size,
+    ...props,
+    className: `${props.className || ''} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`.trim()
+  };
+
+  if (url && !disabled) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer">
-        <FaMap size={size} {...props} />
+        <FaMap {...iconProps} />
       </a>
     );
   }
-  return <FaMap size={size} {...props} />;
+  return <FaMap {...iconProps} />;
 }
 
 export function Location({ size = 25, coordinates = null, ...props }) {

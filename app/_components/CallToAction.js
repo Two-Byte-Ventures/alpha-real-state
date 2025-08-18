@@ -5,7 +5,7 @@ function CallToAction({ coordinates, brochure, name }) {
   return (
     <div className="flex flex-grow justify-around">
       {/** <Picture/> **/}
-      <Brochure url={brochure} />
+      <Brochure url={brochure} disabled={!brochure} />
       <Location coordinates={coordinates} />
       {/* Change number as desired, either hardcode or get it from somewhere else */}
       <Whatsapp number={process.env.NEXT_PUBLIC_WHATSAPP} message={baseMessage}/>
