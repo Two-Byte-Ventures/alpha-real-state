@@ -39,6 +39,10 @@ const AddHousingControl = () => {
   const [urlError, setUrlError] = useState(null);
   const [isValidatingUrl, setIsValidatingUrl] = useState(false);
   
+  // Step management for multi-step form
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 3;
+  
   // Use ref to store current cloudinary data to avoid closure issues
   const cloudinaryDataRef = useRef({ folder: '', tag: '' });
 
@@ -344,6 +348,33 @@ const AddHousingControl = () => {
     setSuccess(false);
     setUrlError(null);
     setIsValidatingUrl(false);
+    setCurrentStep(1); // Reset to first step
+  };
+
+  // Step validation functions
+  const isStep1Valid = () => {
+    return formData.name && formData.price && formData.type;
+  };
+
+  const isStep2Valid = () => {
+    return formData.longitude && formData.latitude && formData.state_name && formData.mun_name;
+  };
+
+  const isStep3Valid = () => {
+    return uploadedImages.length > 0 && !urlError && !isValidatingUrl;
+  };
+
+  // Navigation functions
+  const goToNextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const goToPreviousStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+    }
   };
 
   const handleSubmit = async () => {
@@ -374,6 +405,236 @@ const AddHousingControl = () => {
                      formData.longitude && formData.latitude &&
                      uploadedImages.length > 0 && !urlError && !isValidatingUrl;
 
+  // Get current step validation
+  const getCurrentStepValidation = () => {
+    switch (currentStep) {
+      case 1:
+        return isStep1Valid();
+      case 2:
+        return isStep2Valid();
+      case 3:
+        return isStep3Valid();
+      default:
+        return false;
+    }
+  };
+
+  // Render step 1: Basic Information
+  const renderStep1 = () => (
+    <div className="space-y-4">
+      <Input
+        label={t("housing.name")}
+        placeholder={t("housing.namePlaceholder")}
+        value={formData.name}
+        onValueChange={(value) => handleInputChange("name", value)}
+        isRequired
+      />
+      <Input
+        label={t("housing.price")}
+        placeholder={t("housing.pricePlaceholder")}
+        type="number"
+        value={formData.price}
+        onValueChange={(value) => handleInputChange("price", value)}
+        isRequired
+      />
+      <Select
+        label={t("housing.type")}
+        placeholder={t("housing.typePlaceholder")}
+        selectedKeys={formData.type ? [formData.type] : []}
+        onSelectionChange={(keys) => handleInputChange("type", Array.from(keys)[0] || "")}
+        isRequired
+      >
+        {housingTypes.map((type) => (
+          <SelectItem key={type.key} value={type.key}>
+            {type.label}
+          </SelectItem>
+        ))}
+      </Select>
+      <Input
+        label={t("housing.percentage")}
+        placeholder={t("housing.percentagePlaceholder")}
+        type="number"
+        step="0.1"
+        value={formData.percentage}
+        onValueChange={(value) => handleInputChange("percentage", value)}
+      />
+    </div>
+  );
+
+  // Render step 2: Location
+  const renderStep2 = () => (
+    <div className="space-y-4">
+      <div>
+        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+          <Coordinates size={16} className="text-gray-600" />
+          {t("housing.coordinates")} *
+        </label>
+        <MapCoordinatePicker
+          longitude={parseFloat(formData.longitude) || null}
+          latitude={parseFloat(formData.latitude) || null}
+          onCoordinatesChange={handleCoordinatesChange}
+          mapboxToken={mapboxToken}
+        />
+      </div>
+      
+      <Select
+        label={t("housing.state")}
+        placeholder={t("housing.statePlaceholder")}
+        selectedKeys={formData.state_name ? [formData.state_name] : []}
+        onSelectionChange={(keys) => handleStateChange(Array.from(keys)[0] || "")}
+        isRequired
+        isDisabled={isStateAutoResolved}
+        description={isStateAutoResolved ? "Auto-resolved from map coordinates" : undefined}
+      >
+        {stateOptions.map((state) => (
+          <SelectItem key={state.key} value={state.key}>
+            {state.label}
+          </SelectItem>
+        ))}
+      </Select>
+      
+      <Select
+        label={t("housing.municipality")}
+        placeholder={formData.state_name ? t("housing.municipalityPlaceholder") : t("housing.selectStateFirst")}
+        selectedKeys={formData.mun_name ? [formData.mun_name] : []}
+        onSelectionChange={(keys) => handleInputChange("mun_name", Array.from(keys)[0] || "")}
+        isRequired
+        isDisabled={!formData.state_name || isMunicipalityAutoResolved}
+        description={isMunicipalityAutoResolved ? "Auto-resolved from map coordinates" : undefined}
+      >
+        {municipalityOptions.map((municipality) => (
+          <SelectItem key={municipality.key} value={municipality.key}>
+            {municipality.label}
+          </SelectItem>
+        ))}
+      </Select>
+    </div>
+  );
+
+  // Render step 3: Images and Brochure
+  const renderStep3 = () => (
+    <div className="space-y-4">
+      <div>
+        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+          <Picture size={16} className="text-gray-600" />
+          {t("housing.images")} *
+        </label>
+        
+        <CldUploadWidget
+          key={`${cloudinaryData.folder}-${cloudinaryData.tag}`}
+          cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+          options={{
+            multiple: true,
+            maxFiles: 10,
+            resourceType: "image",
+            clientAllowedFormats: ["jpg", "jpeg", "png", "webp"],
+            maxFileSize: 5000000,
+            sources: ["local", "camera"],
+            language: "es",
+            ...(cloudinaryData.folder && { folder: cloudinaryData.folder }),
+            ...(cloudinaryData.tag && { tags: [cloudinaryData.tag] }),
+            context: cloudinaryData.tag ? { custom_tag: cloudinaryData.tag } : undefined
+          }}
+          onSuccess={(result) => {
+            console.log('Upload result:', result.info);
+            console.log('Expected folder (state):', cloudinaryData.folder);
+            console.log('Expected tag (state):', cloudinaryData.tag);
+            console.log('Expected folder (ref):', cloudinaryDataRef.current.folder);
+            console.log('Expected tag (ref):', cloudinaryDataRef.current.tag);
+            console.log('Actual folder:', result.info.folder);
+            console.log('Actual tags:', result.info.tags);
+            console.log('Full public_id:', result.info.public_id);
+            
+            if (result.info) {
+              setUploadedImages(prev => [...prev, {
+                public_id: result.info.public_id,
+                url: result.info.secure_url,
+                thumbnail: result.info.thumbnail_url || result.info.secure_url
+              }]);
+            }
+          }}
+        >
+          {({ open }) => {
+            return (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!formData.state_name || !formData.mun_name) {
+                      setError(t("housing.selectStateFirst"));
+                      return;
+                    }
+                    console.log('About to upload with:', { folder: cloudinaryData.folder, tag: cloudinaryData.tag });
+                    open();
+                  }}
+                  className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-gray-400 transition-colors disabled:opacity-50"
+                  disabled={!formData.state_name || !formData.mun_name}
+                >
+                  <Plus size={24} className="text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-600 text-center px-4">
+                    {!formData.state_name || !formData.mun_name 
+                      ? t("housing.selectStateFirst")
+                      : "Click to upload images (max 10 files)"
+                    }
+                  </span>
+                </button>
+                
+                {uploadedImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {uploadedImages.map((image, index) => (
+                      <div key={index} className="relative">
+                        <Image 
+                          src={image.thumbnail || image.url} 
+                          alt={`Upload ${index + 1}`}
+                          width={80}
+                          height={80}
+                          className="w-full h-20 object-cover rounded border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUploadedImages(prev => prev.filter((_, i) => i !== index));
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }}
+        </CldUploadWidget>
+      </div>
+      
+      <Input
+        label={t("housing.url")}
+        placeholder={t("housing.urlPlaceholder")}
+        value={formData.url}
+        onValueChange={(value) => handleInputChange("url", value)}
+        startContent={
+          <div className="pointer-events-none flex items-center">
+            <Brochure size={18} className="text-default-400" />
+          </div>
+        }
+        description={urlError ? undefined : t("housing.urlDescription")}
+        errorMessage={urlError}
+        isInvalid={!!urlError}
+        validationState={urlError ? "invalid" : "valid"}
+        endContent={
+          isValidatingUrl ? (
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+            </div>
+          ) : null
+        }
+      />
+    </div>
+  );
+
   return (
     <>
       <div className="absolute bottom-4 right-4 z-20">
@@ -395,13 +656,55 @@ const AddHousingControl = () => {
         placement="center"
         size="2xl"
         scrollBehavior="inside"
+        classNames={{
+          base: "mx-4 my-4 sm:mx-6 sm:my-6",
+          body: "py-6",
+          footer: "px-6 py-4"
+        }}
       >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex items-center gap-3 px-6 py-4">
-                <House size={20} />
-                <span className="text-lg font-semibold">{t("housing.addNew")}</span>
+              <ModalHeader className="flex flex-col gap-1 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <House size={20} />
+                  <span className="text-lg font-semibold">{t("housing.addNew")}</span>
+                </div>
+                
+                {/* Step Indicator */}
+                <div className="flex items-center justify-center mt-4 mb-2">
+                  {[1, 2, 3].map((step) => (
+                    <div key={step} className="flex items-center">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                          step === currentStep
+                            ? "bg-black text-white"
+                            : step < currentStep
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-200 text-gray-600"
+                        }`}
+                      >
+                        {step < currentStep ? "✓" : step}
+                      </div>
+                      {step < 3 && (
+                        <div
+                          className={`w-12 h-0.5 mx-2 transition-colors ${
+                            step < currentStep ? "bg-green-500" : "bg-gray-200"
+                          }`}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Step Titles */}
+                <div className="text-center">
+                  <span className="text-sm text-gray-600">
+                    {currentStep === 1 && t("housing.step1Title")}
+                    {currentStep === 2 && t("housing.step2Title")}
+                    {currentStep === 3 && t("housing.step3Title")}
+                  </span>
+                </div>
               </ModalHeader>
               <ModalBody>
                 {error && (
@@ -414,240 +717,47 @@ const AddHousingControl = () => {
                     {t("housing.addSuccess")}
                   </div>
                 )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input
-                    label={t("housing.name")}
-                    placeholder={t("housing.namePlaceholder")}
-                    value={formData.name}
-                    onValueChange={(value) => handleInputChange("name", value)}
-                    isRequired
-                  />
-                  <Input
-                    label={t("housing.price")}
-                    placeholder={t("housing.pricePlaceholder")}
-                    type="number"
-                    value={formData.price}
-                    onValueChange={(value) => handleInputChange("price", value)}
-                    isRequired
-                  />
-                  <Select
-                    label={t("housing.type")}
-                    placeholder={t("housing.typePlaceholder")}
-                    selectedKeys={formData.type ? [formData.type] : []}
-                    onSelectionChange={(keys) => handleInputChange("type", Array.from(keys)[0] || "")}
-                    isRequired
-                  >
-                    {housingTypes.map((type) => (
-                      <SelectItem key={type.key} value={type.key}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                  <Input
-                    label={t("housing.percentage")}
-                    placeholder={t("housing.percentagePlaceholder")}
-                    type="number"
-                    step="0.1"
-                    value={formData.percentage}
-                    onValueChange={(value) => handleInputChange("percentage", value)}
-                  />
-                  
-                  {/* Map Coordinate Picker - moved before state selection */}
-                  <div className="md:col-span-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                      <Coordinates size={16} className="text-gray-600" />
-                      {t("housing.coordinates")} *
-                    </label>
-                    <MapCoordinatePicker
-                      longitude={parseFloat(formData.longitude) || null}
-                      latitude={parseFloat(formData.latitude) || null}
-                      onCoordinatesChange={handleCoordinatesChange}
-                      mapboxToken={mapboxToken}
-                    />
-                  </div>
-                  
-                  <Select
-                    label={t("housing.state")}
-                    placeholder={t("housing.statePlaceholder")}
-                    selectedKeys={formData.state_name ? [formData.state_name] : []}
-                    onSelectionChange={(keys) => handleStateChange(Array.from(keys)[0] || "")}
-                    isRequired
-                    isDisabled={isStateAutoResolved}
-                    description={isStateAutoResolved ? "Auto-resolved from map coordinates" : undefined}
-                  >
-                    {stateOptions.map((state) => (
-                      <SelectItem key={state.key} value={state.key}>
-                        {state.label}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                  <Select
-                    label={t("housing.municipality")}
-                    placeholder={formData.state_name ? t("housing.municipalityPlaceholder") : t("housing.selectStateFirst")}
-                    selectedKeys={formData.mun_name ? [formData.mun_name] : []}
-                    onSelectionChange={(keys) => handleInputChange("mun_name", Array.from(keys)[0] || "")}
-                    isRequired
-                    isDisabled={!formData.state_name || isMunicipalityAutoResolved}
-                    description={isMunicipalityAutoResolved ? "Auto-resolved from map coordinates" : undefined}
-                  >
-                    {municipalityOptions.map((municipality) => (
-                      <SelectItem key={municipality.key} value={municipality.key}>
-                        {municipality.label}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                </div>
                 
-                {/* Image Upload Section */}
-                <div className="mt-4">
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                    <Picture size={16} className="text-gray-600" />
-                    {t("housing.images")} *
-                  </label>
-                  
-                  <CldUploadWidget
-                    key={`${cloudinaryData.folder}-${cloudinaryData.tag}`} // Force re-render when data changes
-                    cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
-                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-                    options={{
-                      multiple: true,
-                      maxFiles: 10,
-                      resourceType: "image",
-                      clientAllowedFormats: ["jpg", "jpeg", "png", "webp"],
-                      maxFileSize: 5000000, // 5MB
-                      sources: ["local", "camera"],
-                      language: "es",
-                      // Pass folder and tags in options with current values
-                      ...(cloudinaryData.folder && { folder: cloudinaryData.folder }),
-                      ...(cloudinaryData.tag && { tags: [cloudinaryData.tag] }),
-                      // Force override preset settings
-                      context: cloudinaryData.tag ? { custom_tag: cloudinaryData.tag } : undefined
-                    }}
-                    onSuccess={(result) => {
-                      console.log('Upload result:', result.info);
-                      console.log('Expected folder (state):', cloudinaryData.folder);
-                      console.log('Expected tag (state):', cloudinaryData.tag);
-                      console.log('Expected folder (ref):', cloudinaryDataRef.current.folder);
-                      console.log('Expected tag (ref):', cloudinaryDataRef.current.tag);
-                      console.log('Actual folder:', result.info.folder);
-                      console.log('Actual tags:', result.info.tags);
-                      console.log('Full public_id:', result.info.public_id);
-                      
-                      if (result.info) {
-                        setUploadedImages(prev => [...prev, {
-                          public_id: result.info.public_id,
-                          url: result.info.secure_url,
-                          thumbnail: result.info.thumbnail_url || result.info.secure_url
-                        }]);
-                      }
-                    }}
-                  >
-                    {({ open }) => {
-                      return (
-                        <div className="space-y-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (!formData.state_name || !formData.mun_name) {
-                                setError(t("housing.selectStateFirst"));
-                                return;
-                              }
-                              console.log('About to upload with:', { folder: cloudinaryData.folder, tag: cloudinaryData.tag });
-                              open();
-                            }}
-                          className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-gray-400 transition-colors disabled:opacity-50"
-                          disabled={!formData.state_name || !formData.mun_name}
-                        >
-                          <Plus size={24} className="text-gray-400 mb-2" />
-                          <span className="text-sm text-gray-600 text-center px-4">
-                            {!formData.state_name || !formData.mun_name 
-                              ? t("housing.selectStateFirst")
-                              : "Click to upload images (max 10 files)"
-                            }
-                          </span>
-                        </button>
-                        
-                        {/* Display uploaded images */}
-                        {uploadedImages.length > 0 && (
-                          <div className="grid grid-cols-3 gap-2">
-                            {uploadedImages.map((image, index) => (
-                              <div key={index} className="relative">
-                                <Image 
-                                  src={image.thumbnail || image.url} 
-                                  alt={`Upload ${index + 1}`}
-                                  width={80}
-                                  height={80}
-                                  className="w-full h-20 object-cover rounded border"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setUploadedImages(prev => prev.filter((_, i) => i !== index));
-                                  }}
-                                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        </div>
-                      );
-                    }}
-                  </CldUploadWidget>
-                </div>
-                
-                {/* PDF Brochure URL - moved to last position */}
-                <div className="mt-4">
-                  <Input
-                    label={t("housing.url")}
-                    placeholder={t("housing.urlPlaceholder")}
-                    value={formData.url}
-                    onValueChange={(value) => handleInputChange("url", value)}
-                    startContent={
-                      <div className="pointer-events-none flex items-center">
-                        <Brochure size={18} className="text-default-400" />
-                      </div>
-                    }
-                    description={urlError ? undefined : t("housing.urlDescription")}
-                    errorMessage={urlError}
-                    isInvalid={!!urlError}
-                    validationState={urlError ? "invalid" : "valid"}
-                    endContent={
-                      isValidatingUrl ? (
-                        <div className="flex items-center">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                        </div>
-                      ) : null
-                    }
-                  />
-                </div>
-                
-                {error && (
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
-                    {error}
-                  </div>
-                )}
-                
-                {success && (
-                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mt-4">
-                    {t("housing.addSuccess")}
-                  </div>
-                )}
+                {/* Render current step */}
+                {currentStep === 1 && renderStep1()}
+                {currentStep === 2 && renderStep2()}
+                {currentStep === 3 && renderStep3()}
               </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  {t("housing.cancel")}
-                </Button>
-                <Button 
-                  className="bg-black text-white hover:bg-gray-800 data-[pressed=true]:scale-[0.97] data-[hover=true]:bg-gray-800"
-                  onPress={handleSubmit}
-                  isLoading={isSubmitting}
-                  isDisabled={!isFormValid}
-                >
-                  {t("housing.save")}
-                </Button>
+              <ModalFooter className="flex justify-between">
+                <div className="flex gap-2">
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    {t("housing.cancel")}
+                  </Button>
+                  {currentStep > 1 && (
+                    <Button 
+                      variant="bordered" 
+                      onPress={goToPreviousStep}
+                    >
+                      {t("housing.previous")}
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="flex gap-2">
+                  {currentStep < totalSteps ? (
+                    <Button 
+                      className="bg-black text-white hover:bg-gray-800 data-[pressed=true]:scale-[0.97] data-[hover=true]:bg-gray-800"
+                      onPress={goToNextStep}
+                      isDisabled={!getCurrentStepValidation()}
+                    >
+                      {t("housing.next")}
+                    </Button>
+                  ) : (
+                    <Button 
+                      className="bg-black text-white hover:bg-gray-800 data-[pressed=true]:scale-[0.97] data-[hover=true]:bg-gray-800"
+                      onPress={handleSubmit}
+                      isLoading={isSubmitting}
+                      isDisabled={!isFormValid}
+                    >
+                      {t("housing.save")}
+                    </Button>
+                  )}
+                </div>
               </ModalFooter>
             </>
           )}
