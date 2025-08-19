@@ -6,6 +6,9 @@ const i18n = rosetta({
     shared: {
       title: "tusiguientecasa.com",
       start: "Comenzar",
+      filters: "Filtros",
+      price: "Precio",
+      propertyType: "Tipo de Propiedad",
     },
     landing: {
       title: "Encuentra tu siguiente mejor",

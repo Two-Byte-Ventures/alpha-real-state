@@ -8,7 +8,7 @@ import { useTranslations } from "@/app/hooks/use-translations";
 import useSourcesStore from "../stores/useSourcesStore";
 import MapCoordinatePicker from "./MapCoordinatePicker";
 
-const AddHousingControl = () => {
+const AddHousingControl = ({ embedded = false }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { addHousingItem, statesGeoJSON, municipalitiesGeoJSON } = useSourcesStore();
   const { t } = useTranslations();
@@ -637,18 +637,31 @@ const AddHousingControl = () => {
 
   return (
     <>
-      <div className="absolute bottom-4 right-4 z-20">
+      {embedded ? (
         <Button
           isIconOnly
           color="primary"
           variant="solid"
-          className="rounded-full w-12 h-12 shadow-lg"
+          className="rounded-full w-10 h-10 shadow-lg"
           onPress={onOpen}
           aria-label={t("housing.add")}
         >
-          <Plus size={20} />
+          <Plus size={16} />
         </Button>
-      </div>
+      ) : (
+        <div className="absolute bottom-4 right-4 z-20">
+          <Button
+            isIconOnly
+            color="primary"
+            variant="solid"
+            className="rounded-full w-12 h-12 shadow-lg"
+            onPress={onOpen}
+            aria-label={t("housing.add")}
+          >
+            <Plus size={20} />
+          </Button>
+        </div>
+      )}
 
       <Modal 
         isOpen={isOpen} 

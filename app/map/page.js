@@ -8,9 +8,7 @@ import MarkerPopover from "./MarkerPopover";
 import useMap from "./useMap";
 import useSourcesStore from "../stores/useSourcesStore";
 import useMarkers from "./useMarkers";
-import PriceFilter from "./PriceFilter";
-import HousingTypeFilter from "./HousingTypeFilter";
-import AddHousingControl from "./AddHousingControl";
+import UnifiedControls from "./UnifiedControls";
 
 export default function Page() {
   const {
@@ -152,9 +150,7 @@ export default function Page() {
         onClose={handleClosePopover}
       />
 
-      <PriceFilter />
-      <HousingTypeFilter />
-      <AddHousingControl />
+      <UnifiedControls />
 
       <Script
         src="https://product-gallery.cloudinary.com/latest/all.js"
